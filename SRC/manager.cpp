@@ -2,8 +2,13 @@
 
 #include "UTILS/string_utilities.h"
 
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
+
 #include <fstream> 
 #include <map>
+#include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -28,7 +33,15 @@ void Manager::load_input(string input_filename)
 		auto data = split(line,' ');
 		name_value[ data[0] ] = data[1];
 	}
-	
+
+  if( name_value.count("cfg")==0 )
+    throw 'c';
+
+
+  verbose_logging = stoi(name_value["verbose_logging"]);
+  name_value.erase("verbose_logging");
+
+  ///Construct lattice data container
 	lat = Lattice( stoi(name_value["nx"]), 
 								 stoi(name_value["ny"]), 
 								 stoi(name_value["nz"]), 
@@ -39,6 +52,10 @@ void Manager::load_input(string input_filename)
 	name_value.erase("nz");
 	name_value.erase("nt");
 	name_value.erase("cfg");
+
+  ///Set up logging system
+  create_logs();
+
 
 	///log output as it's read in
 
@@ -51,13 +68,31 @@ void Manager::load_input(string input_filename)
 			///add error log output
 			///"Key=" << e.first << " | Value=" << e.second << endl;
 		}
+    ///i for input error
 		throw 'i';
 	}
 
 }
 
+void Manager::create_logs()
+{
+  stringstream scfg;
+  scfg << std::setfill('0') << std::setw(3) << lat.cfg;
+
+  ///We always create one log file to show what input was read in
+  ///and to track major points in control flow.  
+  auto main_logger = spdlog::basic_logger_mt("main", "logs/main_"+scfg.str()+".log");
+  
+  main_logger->info("Program started up.");
+  ///Just doing one extra type of output - debug/verbose
+  if(verbose_logging)
+  {
+    auto wick_logger = spdlog::basic_logger_mt("wick", "logs/wick_"+scfg.str()+".log"); 
+  }
+}
 
 void Manager::load_operators()
 {
-
+  auto main_logger = spdlog::get("main");
+  main_logger->info("Begin loading operators");
 }

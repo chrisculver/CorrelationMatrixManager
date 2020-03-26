@@ -3,3 +3,4 @@ ny 4
 nz 4
 nt 4
 cfg 100
+verbose_logging 1

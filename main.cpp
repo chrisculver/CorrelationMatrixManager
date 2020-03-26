@@ -16,9 +16,15 @@ int main(int argc, char **argv)
 		run.load_input( input_filename );
 		run.load_operators();
 	}
-	catch(exception &ex)
+	catch(char &ex)
 	{
-		///log error failed loading input
+	  if(ex == 'e')
+    {  
+      cout << "ERROR: CFG missing from input\n";
+      cout << "       Cannot create log files\n";
+      cout << "       Exiting...";
+    }
+    ///log error failed loading input
 		return 9;
 	}
 

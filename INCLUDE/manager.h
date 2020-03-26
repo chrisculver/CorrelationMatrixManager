@@ -11,17 +11,20 @@ struct Lattice
 	Lattice(int x, int y, int z, int t, int c):nx(x),ny(y),nz(z),nt(t),cfg(c){};
 };
 
+
 struct Manager
 {
-	
+  bool verbose_logging;	
 	Lattice lat;
 //	File_Manager fm;
-//	Log_Manager lm;
 
 	Manager(){};
 
 	///This function parses the input into it's data structures
 	void load_input(std::string filename);
+
+  ///Creates the loggers
+  void create_logs();
 
 	///This functions loads the operators from a file
 	void load_operators();
