@@ -3,25 +3,37 @@
 
 #include <string>
 
-
-class Manager
+struct Lattice
 {
-	Lattice lat;
-	File_Manager fm;
+	int nx,ny,nz,nt,cfg;
 
-	Manager(std::string input_filename);
+	Lattice(){nx=0;ny=0;nz=0;nt=0;cfg=0;}
+	Lattice(int x, int y, int z, int t, int c):nx(x),ny(y),nz(z),nt(t),cfg(c){};
+};
+
+struct Manager
+{
+	
+	Lattice lat;
+//	File_Manager fm;
+//	Log_Manager lm;
+
+	Manager(){};
+
+	///This function parses the input into it's data structures
+	void load_input(std::string filename);
 
 	///This functions loads the operators from a file
 	void load_operators();
 
 	///This function performs the wick contractions for all correlation matrix elements
-	void wick_contractions();
+//	void wick_contractions();
 
 	///This function loads the diagrams from a file(s). 
-	void load_diagrams();
+//	void load_diagrams();
 
 	///This function multiplies traces and averages over time slices
-	void compute_correlators();
+//	void compute_correlators();
 
 };
 

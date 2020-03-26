@@ -3,14 +3,16 @@ project("Correlation Matrix Manager")
 
 SET(GCC_COMPILE_FLAGS "-std=c++17 -O3")
 
-include_directories(INCLUDE $ENV{HOME}/Code/Libraries/gwu-qcd/include)
-file(GLOB SOURCES "SRC/*.cpp" main.cpp)
+include_directories(INCLUDE $ENV{HOME}/Code/Libraries/gwu-qcd/include INCLUDE/)
+file(GLOB SOURCES "SRC/*.cpp" "SRC/UTILS/*.cpp" main.cpp)
 
 add_executable(compute_correlation_matrix ${SOURCES})
 
 #include GWU-QCD library
 find_library(GWUQCDlib libqcd.a $ENV{HOME}/Code/Libraries/gwu-qcd/lib/)
 target_link_libraries(compute_correlation_matrix ${GWUQCDlib})
+
+
 
 set_target_properties(
   compute_correlation_matrix PROPERTIES
@@ -19,6 +21,6 @@ set_target_properties(
   COMPILE_FLAGS "${WARNING_FLAGS}"
  )
 
+# Set up the documentation
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMAKE" ${CMAKE_MODULE_PATH})
-
 add_subdirectory("DOCS")
