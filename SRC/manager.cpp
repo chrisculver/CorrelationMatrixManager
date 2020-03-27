@@ -1,6 +1,7 @@
 #include "manager.h"
 
 #include "UTILS/string_utilities.h"
+#include "UTILS/file_utilities.h"
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
@@ -24,7 +25,13 @@ using namespace std;
  */
 void Manager::load_input(string input_filename)
 {
-	ifstream input(input_filename);
+	if( !file_exists(input_filename) )
+  {
+    throw 'm';
+  }
+  
+  
+  ifstream input(input_filename);
 	map<string, string> name_value;
 
 	string line;

@@ -18,20 +18,21 @@ int main(int argc, char **argv)
 	}
 	catch(char &ex)
 	{
-	  if(ex == 'e')
+	  if(ex == 'm')
+    {
+      cout << "Error: Can't open input file\n";
+      cout << "       Exiting...\n";
+    }
+    
+    if(ex == 'e')
     {  
       cout << "ERROR: CFG missing from input\n";
       cout << "       Cannot create log files\n";
-      cout << "       Exiting...";
+      cout << "       Exiting...\n";
     }
     ///log error failed loading input
 		return 9;
 	}
-
-
-
-
-
 
 
 
