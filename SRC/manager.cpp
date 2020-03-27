@@ -7,6 +7,7 @@
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/fmt/ostr.h"
 
 #include <iostream>
 #include <fstream> 
@@ -67,13 +68,18 @@ void Manager::load_input(string input_filename)
   ///Set up logging system
   create_logs();
 	auto main_logger = spdlog::get("main");
-	main_logger->info("Loaded lattice variables");
+	main_logger->info("Loaded lattice data\nnx={} | ny={} | nz={} | nt={} | cfg={}\n",
+										 lat.nx, lat.ny, lat.nz, lat.nt, cfg_to_string(lat.cfg));	
 	
 	files = FileNames(name_value["operator_filename"], name_value["diagram_filename"]);
 	name_value.erase("operator_filename");
 	name_value.erase("diagram_filename");	
 
-	main_logger->info("Loaded filenames");
+	main_logger->info("Loaded filenames\noperator_filename = {} | diagram_filename = {}\n",
+									  files.operator_filename, files.diagram_filename );
+
+	if(!verbose_logging)
+		main_logger->info("Loaded all input data\n");
 
 	if(name_value.size() > 0)
 	{
@@ -101,14 +107,22 @@ void Manager::create_logs()
   if(verbose_logging)
   {
     auto wick_logger = spdlog::basic_logger_mt("wick", "logs/wick_"+cfg_to_string(lat.cfg)+".log"); 
-  }
+		auto op_logger = spdlog::basic_logger_mt("op", "logs/op_"+cfg_to_string(lat.cfg)+".log");
+	}
 }
 
 void Manager::load_operators()
 {
-  auto main_logger = spdlog::get("main");
-  main_logger->info("Begin loading operators");
+  ///TODO Have better error messages when things break!
+	///Several parts can seg fault if the operator's have a typo in them.
 	
+	auto main_logger = spdlog::get("main");
+  main_logger->info("Begin loading operators");
+	main_logger->info("Warning: Bad error handling ahead\n");
+	auto op_logger = spdlog::get("main");
+	if(verbose_logging)
+		op_logger = spdlog::get("op");
+
 	if( !file_exists(files.operator_filename) )
 		throw 'o';
 	
@@ -117,7 +131,9 @@ void Manager::load_operators()
 	while(getline(op_file,line))
 	{
     vector<ElementalOp> elems;
-    
+		if(verbose_logging)
+			op_logger->info("Read line = {}",line);
+
 		auto op_sum = split(line, '+');
     for(const auto term:op_sum)
     {
@@ -136,6 +152,8 @@ void Manager::load_operators()
 	} 
   op_file.close();
 
-	main_logger->info("Finished loading operators");
+	main_logger->info("Finished loading the following operators");
+	for(size_t i=0; i<ops.size(); ++i)
+		main_logger->info("Operator {} = {}", i, ops[i]);
 	main_logger->flush();
 }

@@ -12,6 +12,12 @@ struct Meson
 
 	Meson(char l, std::string g, std::string d, std::string m, char r):
 		ql(l), gamma(g), displacement(d), mom(m), qr(r){};
+
+	template<typename OStream>
+	friend OStream &operator<<(OStream &os, const Meson &m)
+	{
+		return os << m.ql << "," << m.gamma << "," << m.displacement << "," << m.mom << "," << m.qr;
+	}
 };
 
 #endif
