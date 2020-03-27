@@ -1,5 +1,7 @@
 #include "manager.h"
 
+#include "UTILS/string_utilities.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -18,22 +20,31 @@ int main(int argc, char **argv)
 	}
 	catch(char &ex)
 	{
-	  if(ex == 'm')
+	  if(ex == 'f')
     {
-      cout << "Error: Can't open input file\n";
-      cout << "       Exiting...\n";
+      cout << "CRITICAL ERROR: Can't open input file\n";
+      cout << "								 Exiting...\n";
     }
     
-    if(ex == 'e')
+    if(ex == 'c')
     {  
-      cout << "ERROR: CFG missing from input\n";
-      cout << "       Cannot create log files\n";
-      cout << "       Exiting...\n";
+      cout << "CRITICAL ERROR: CFG missing from input\n";
+      cout << "								 Cannot create log files\n";
+      cout << "								 Exiting...\n";
     }
-    ///log error failed loading input
+		if(ex == 'i')
+		{
+			cout << "CRITICAL ERROR: Extra input variable found\n";
+			cout << "								 See main_"+cfg_to_string(run.lat.cfg)+".log";
+			cout << "					       Exiting...\n";
+		}
+		if(ex == 'o')
+		{
+			cout << "CRITICAL ERROR: Couldn't find operator file\n";
+			cout << "                Exiting...\n";
+		}
 		return 9;
 	}
-
 
 
 

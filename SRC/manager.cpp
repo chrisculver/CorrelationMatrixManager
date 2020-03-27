@@ -1,15 +1,17 @@
 #include "manager.h"
 
+#include "OPS/elemental_op.h"
+#include "OPS/meson.h"
 #include "UTILS/string_utilities.h"
 #include "UTILS/file_utilities.h"
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
 
+#include <iostream>
 #include <fstream> 
 #include <map>
-#include <sstream>
-#include <iomanip>
+#include <string>
 
 using namespace std;
 
@@ -25,9 +27,10 @@ using namespace std;
  */
 void Manager::load_input(string input_filename)
 {
+	///Make sure the input file exists, if not error
 	if( !file_exists(input_filename) )
   {
-    throw 'm';
+    throw 'f';
   }
   
   
@@ -41,6 +44,7 @@ void Manager::load_input(string input_filename)
 		name_value[ data[0] ] = data[1];
 	}
 
+	///We label logs files by cfg, so make sure this input variable exists.
   if( name_value.count("cfg")==0 )
     throw 'c';
 
@@ -62,39 +66,41 @@ void Manager::load_input(string input_filename)
 
   ///Set up logging system
   create_logs();
+	auto main_logger = spdlog::get("main");
+	main_logger->info("Loaded lattice variables");
+	
+	files = FileNames(name_value["operator_filename"], name_value["diagram_filename"]);
+	name_value.erase("operator_filename");
+	name_value.erase("diagram_filename");	
 
-
-	///log output as it's read in
+	main_logger->info("Loaded filenames");
 
 	if(name_value.size() > 0)
 	{
-		///add error log output
-
+		///TODO add error log output
+		
 		for(auto &e : name_value)
 		{
-			///add error log output
+			///TODO  error log output
 			///"Key=" << e.first << " | Value=" << e.second << endl;
 		}
     ///i for input error
 		throw 'i';
 	}
 
+	main_logger->flush();
 }
 
 void Manager::create_logs()
 {
-  stringstream scfg;
-  scfg << std::setfill('0') << std::setw(3) << lat.cfg;
-
   ///We always create one log file to show what input was read in
   ///and to track major points in control flow.  
-  auto main_logger = spdlog::basic_logger_mt("main", "logs/main_"+scfg.str()+".log");
-  
+  auto main_logger = spdlog::basic_logger_mt("main", "logs/main_"+cfg_to_string(lat.cfg)+".log");
   main_logger->info("Program started up.");
   ///Just doing one extra type of output - debug/verbose
   if(verbose_logging)
   {
-    auto wick_logger = spdlog::basic_logger_mt("wick", "logs/wick_"+scfg.str()+".log"); 
+    auto wick_logger = spdlog::basic_logger_mt("wick", "logs/wick_"+cfg_to_string(lat.cfg)+".log"); 
   }
 }
 
@@ -102,4 +108,34 @@ void Manager::load_operators()
 {
   auto main_logger = spdlog::get("main");
   main_logger->info("Begin loading operators");
+	
+	if( !file_exists(files.operator_filename) )
+		throw 'o';
+	
+	ifstream op_file(files.operator_filename);
+	string line;
+	while(getline(op_file,line))
+	{
+    vector<ElementalOp> elems;
+    
+		auto op_sum = split(line, '+');
+    for(const auto term:op_sum)
+    {
+      auto meson_text = split(term, '|');
+			int coef = stoi(meson_text[0]); 
+			meson_text.erase(meson_text.begin(), meson_text.begin()+1);
+      vector<Meson> ms;
+      for(const auto meson:meson_text)
+      {
+        vector<string> data = split(meson,',');
+				ms.push_back(Meson(data[0][0],data[1],data[2],data[3],data[4][0]));
+      }
+      elems.push_back(ElementalOp(coef, ms));
+    }
+    ops.push_back(Operator(elems));
+	} 
+  op_file.close();
+
+	main_logger->info("Finished loading operators");
+	main_logger->flush();
 }

@@ -1,6 +1,7 @@
 #include "UTILS/string_utilities.h"
 
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -19,4 +20,11 @@ template<typename Out> void split(const string &s, char delim, Out result)
   {
     *(result++) = item;
   }
+}
+
+string cfg_to_string(int cfg)
+{
+	stringstream scfg;
+	scfg << std::setfill('0') << std::setw(3) << cfg;
+	return scfg.str();
 }
