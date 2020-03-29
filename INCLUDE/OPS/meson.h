@@ -18,6 +18,9 @@ struct Meson
 	{
 		return os << m.ql << "," << m.gamma << "," << m.displacement << "," << m.mom << "," << m.qr;
 	}
+
 };
+	
+Meson adjoint(Meson m);
 
 #endif

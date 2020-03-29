@@ -28,6 +28,7 @@ struct Operator
 
 };
 
+Operator adjoint(Operator o);
 
 
 #endif

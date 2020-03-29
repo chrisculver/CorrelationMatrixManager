@@ -2,6 +2,7 @@
 #define MANAGER_H
 
 #include "OPS/operator.h"
+#include "DIAGS/correlator.h"
 
 #include <string>
 
@@ -41,6 +42,8 @@ struct Manager
 
 	std::vector<Operator> ops;
 
+	std::vector<Correlator> corrs;
+
 	Manager(){};
 
 	///This function parses the input into it's data structures
@@ -53,7 +56,7 @@ struct Manager
 	void load_operators();
 
 	///This function performs the wick contractions for all correlation matrix elements
-//	void wick_contractions();
+	void wick_contractions();
 
 	///This function loads the diagrams from a file(s). 
 //	void load_diagrams();

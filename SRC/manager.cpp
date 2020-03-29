@@ -1,5 +1,6 @@
 #include "manager.h"
 
+#include "OPS/operator.h"
 #include "OPS/elemental_op.h"
 #include "OPS/meson.h"
 #include "UTILS/string_utilities.h"
@@ -115,10 +116,10 @@ void Manager::load_operators()
 {
   ///TODO Have better error messages when things break!
 	///Several parts can seg fault if the operator's have a typo in them.
-	
 	auto main_logger = spdlog::get("main");
   main_logger->info("Begin loading operators");
 	main_logger->info("Warning: Bad error handling ahead\n");
+	
 	auto op_logger = spdlog::get("main");
 	if(verbose_logging)
 		op_logger = spdlog::get("op");
@@ -151,9 +152,22 @@ void Manager::load_operators()
     ops.push_back(Operator(elems));
 	} 
   op_file.close();
+	
 
 	main_logger->info("Finished loading the following operators");
 	for(size_t i=0; i<ops.size(); ++i)
 		main_logger->info("Operator {} = {}", i, ops[i]);
+
+	for(const auto &c : ops)
+		for(const auto &a : ops)
+			corrs.push_back( Correlator(adjoint(a), c) );
+
 	main_logger->flush();
+}
+
+
+void Manager::wick_contractions()
+{
+	for(auto &c: corrs)
+		c.wick_contract();
 }

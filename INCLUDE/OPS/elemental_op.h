@@ -25,5 +25,9 @@ struct ElementalOp
 			}
 			return os;
 		}
+
 };
+		
+ElementalOp adjoint(ElementalOp e);
+
 #endif

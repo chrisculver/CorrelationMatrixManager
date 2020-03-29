@@ -46,6 +46,7 @@ int main(int argc, char **argv)
 		return 9;
 	}
 
+	run.wick_contractions();
 
 
 	return 0;
