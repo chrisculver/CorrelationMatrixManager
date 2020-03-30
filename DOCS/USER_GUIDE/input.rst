@@ -1,7 +1,8 @@
 Input
 =====
 
-There are three sources of file input to the program.
+There are three sources of file input to the program.  Here we review the 
+specification for the various sources of input.
 
 
 
@@ -30,9 +31,18 @@ Operator List
 -------------
 Currently this code takes an input of operators, for examples see ``simple_pions.op`` and 
 ``multi_pions.op`` for an example of some multi-meson operators.  See physics/operators.rst
-for a full description of how operators are specified.
+for a full description of how operators are specified.  Each line of the file contains
+a single operator, projected to an irrep.  Each operator is a sum of elementals, separated by a
++ sign with no spaces(the first elemental does not start with a plus sign).  Immediately following
+the plus sign is an integer coeficient, followed by a ``|``.  Then any number of mesons can 
+be specified each separated by their own ``|``.  The data within a meson is specified by
+a ``,``.  It's the anti-quark, gamma structure, displacement structure, momenta, then quark. 
+Spaces in gamma structure and displacement structure can be used to represent a product of
+structures.  The momenta is specified in lattice units with an integer in each direction.
 
 
 
 Diagram File(s)
 ---------------
+The diagram file names are currently just labeled by configuration number.  First there is
+the diagram name, then ``NT\times NT`` values.  

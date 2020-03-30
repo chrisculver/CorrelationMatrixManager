@@ -16,7 +16,7 @@ matrix, exiting if wick contractions or numerical evaluation of diagrams are mis
     :maxdepth: 2
 
     USER_GUIDE/getting_started.rst
-
+    USER_GUIDE/input.rst
 
 ..  toctree::
     :caption: Physics
