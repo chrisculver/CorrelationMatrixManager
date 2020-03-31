@@ -11,12 +11,14 @@ struct Operator
 {
 	public:
 		std::vector<ElementalOp> terms;
-	
-		Operator(std::vector<ElementalOp> t):terms(t){};
+    int coef;
+
+		Operator(int c, std::vector<ElementalOp> t):coef(c), terms(t){};
 
 		template<typename OStream>
 		friend OStream &operator<<(OStream &os, const Operator &o)
 		{
+      os << o.coef << "   ";
 			for(size_t i=0; i<o.terms.size(); ++i)
 			{
 				os << o.terms[i];

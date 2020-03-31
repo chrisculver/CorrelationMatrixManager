@@ -3,14 +3,16 @@
 
 void Correlator::wick_contract()
 {
-	std::vector<Diagram> some_diags;
+	std::vector<Diagram> new_diags;
 	for(const auto &c_e: c.terms)
 		for(const auto &a_e: a.terms)
 		{
-			some_diags=wick_contract_elems(c_e, a_e);
-
+			new_diags=wick_contract_elems(c_e, a_e);
+       
 			///push some diags into diags
 			///not duplicating elements
 		}
 
+  for(auto &d: diags)
+    d.coef = d.coef*c.coef*a.coef;
 }

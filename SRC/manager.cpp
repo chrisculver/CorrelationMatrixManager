@@ -134,10 +134,11 @@ void Manager::load_operators()
 		op_logger->debug("Read line = {}",line);
 
 		auto op_sum = split(line, '+');
+    int coef;
     for(const auto term:op_sum)
     {
       auto meson_text = split(term, '|');
-			int coef = stoi(meson_text[0]); 
+			coef = stoi(meson_text[0]); 
 			meson_text.erase(meson_text.begin(), meson_text.begin()+1);
       vector<Meson> ms;
       for(const auto meson:meson_text)
@@ -147,7 +148,7 @@ void Manager::load_operators()
       }
       elems.push_back(ElementalOp(coef, ms));
     }
-    ops.push_back(Operator(elems));
+    ops.push_back(Operator(coef,elems));
 	} 
   op_file.close();
 	

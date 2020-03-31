@@ -59,9 +59,10 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 //	cout << "printed all permutations\n";
 	
 	vector<Diagram> res;
-	for(const auto &lst: all_barred_permutations)
+	for(size_t i=0; i<all_barred_permutations.size(); ++i)
 	{
-		bool contractable = true;
+		auto lst = all_barred_permutations[i];
+    bool contractable = true;
 		for(size_t q=0; q<unbarred.size(); ++q)
 			if(unbarred[q].flavor != lst[q].flavor)
 				contractable = false;
@@ -88,8 +89,12 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 					starting_meson = unbarred[(q+1)%unbarred.size()].label;///does the mod need to be there?
 				}
 			}
-			cout << endl;	
-			res.push_back(d);
+			cout << endl;
+		  if(all_signs[i])
+        d.coef=1;
+      else
+        d.coef=-1;  
+      res.push_back(d);
 		}
 	}		
 	
