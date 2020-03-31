@@ -8,9 +8,10 @@
 
 class Trace
 {
-	std::vector<QuarkLine> qls;
+	public:
+		std::vector<QuarkLine> qls;
 
-	std::vector<std::vector<std::complex<double>>> numerical_value;
+		std::vector<std::vector<std::complex<double>>> numerical_value;
 };
 
 #endif

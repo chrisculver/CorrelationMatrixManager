@@ -64,6 +64,8 @@ struct Manager
 	///This function multiplies traces and averages over time slices
 //	void compute_correlators();
 
+	///Deletes spdlogger - everything else should delete under RAII
+	void shutdown();
 };
 
 #endif

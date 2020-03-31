@@ -10,6 +10,7 @@ struct Meson
 	///The structure that determines Gamma(p).
 	std::string gamma, displacement, mom;
 
+	Meson(){};
 	Meson(char l, std::string g, std::string d, std::string m, char r):
 		ql(l), gamma(g), displacement(d), mom(m), qr(r){};
 

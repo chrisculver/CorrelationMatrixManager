@@ -3,6 +3,7 @@
 
 #include "DIAGS/trace.h"
 
+#include <string>
 #include <vector>
 
 class Diagram
@@ -10,6 +11,11 @@ class Diagram
 	public:
 		std::vector<Trace> traces;
 		int coef;
+	
+	Diagram(){coef=0;};
+	Diagram(int c, std::vector<Trace> t):coef(c), traces(t){};
+
+	std::string name() const;
 };
 
 #endif

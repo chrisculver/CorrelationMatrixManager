@@ -103,13 +103,14 @@ void Manager::create_logs()
   ///We always create one log file to show what input was read in
   ///and to track major points in control flow.  
   auto main_logger = spdlog::basic_logger_mt("main", "logs/main_"+cfg_to_string(lat.cfg)+".log");
+	main_logger->set_level(spdlog::level::info);
   main_logger->info("Program started up.");
   ///Just doing one extra type of output - debug/verbose
-  if(verbose_logging)
-  {
-    auto wick_logger = spdlog::basic_logger_mt("wick", "logs/wick_"+cfg_to_string(lat.cfg)+".log"); 
-		auto op_logger = spdlog::basic_logger_mt("op", "logs/op_"+cfg_to_string(lat.cfg)+".log");
-	}
+  auto wick_logger = spdlog::basic_logger_mt("wick", "logs/wick_"+cfg_to_string(lat.cfg)+".log"); 
+	auto op_logger = spdlog::basic_logger_mt("op", "logs/op_"+cfg_to_string(lat.cfg)+".log");
+	
+	wick_logger->set_level(spdlog::level::debug);
+	op_logger->set_level(spdlog::level::debug);
 }
 
 void Manager::load_operators()
@@ -120,9 +121,7 @@ void Manager::load_operators()
   main_logger->info("Begin loading operators");
 	main_logger->info("Warning: Bad error handling ahead\n");
 	
-	auto op_logger = spdlog::get("main");
-	if(verbose_logging)
-		op_logger = spdlog::get("op");
+	auto op_logger = spdlog::get("op");
 
 	if( !file_exists(files.operator_filename) )
 		throw 'o';
@@ -132,8 +131,7 @@ void Manager::load_operators()
 	while(getline(op_file,line))
 	{
     vector<ElementalOp> elems;
-		if(verbose_logging)
-			op_logger->info("Read line = {}",line);
+		op_logger->debug("Read line = {}",line);
 
 		auto op_sum = split(line, '+');
     for(const auto term:op_sum)
@@ -162,6 +160,7 @@ void Manager::load_operators()
 		for(const auto &a : ops)
 			corrs.push_back( Correlator(adjoint(a), c) );
 
+	op_logger->flush();
 	main_logger->flush();
 }
 
@@ -170,4 +169,10 @@ void Manager::wick_contractions()
 {
 	for(auto &c: corrs)
 		c.wick_contract();
+}
+
+
+void Manager::shutdown()
+{
+	spdlog::shutdown();
 }
