@@ -6,6 +6,8 @@
 
 #include <vector>
 #include <complex>
+#include <map>
+#include <string>
 
 class Correlator
 {
@@ -19,6 +21,9 @@ class Correlator
 		Correlator(Operator n_a, Operator c_a):c(c_a), a(n_a){};
 
 		void wick_contract();
+		
+		using Saved_Traces = std::map<std::string, std::vector<std::vector<std::complex<double>>> >;
+		void load_numerical_results(Saved_Traces computed); 
 };
 
 #endif

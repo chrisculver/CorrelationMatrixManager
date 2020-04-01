@@ -180,6 +180,249 @@ void Manager::wick_contractions()
 }
 
 
+void Manager::load_numerical_results()
+{
+	auto main_logger = spdlog::get("main");
+	if( !file_exists(files.diagram_filename) )
+	{
+		main_logger->info("No diagram file found");
+		throw traces_to_compute();
+	}
+
+	auto computed = parse_diagram_file(files.diagram_filename, lat.nt); 
+
+	for(auto &c: corrs)
+	{
+		try
+		{
+			c.load_numerical_results(computed);
+		}
+		catch(char missing)
+		{
+			vector<string> computed_names;
+			for(const auto &c : computed)
+				computed_names.push_back(c.first);
+			throw traces_to_compute(computed_names);  
+		}
+	}
+}
+
+
+vector<Trace> Manager::traces_to_compute()
+{
+	vector<Trace> res;
+	for(auto &c: corrs)
+	for(auto &d: c.diags)
+	for(auto &t: d.traces)
+	{
+		Trace r = t;
+		bool found=false;
+		for(size_t i=0; i<r.qls.size(); ++i)
+		{
+			if( find(res.begin(), res.end(), r) != res.end() )
+				found=true;
+			rotate( r.qls.begin(), r.qls.begin()+1, r.qls.end() );
+		}
+		if(!found)
+			res.push_back(t);
+	}
+
+	return res;
+}
+
+vector<Trace> Manager::traces_to_compute(const vector<string> computed_names)
+{
+	///TODO : make this use computed_names, I don't want to do this yet until 
+	/// I have some safe way to merge/combine/handle diagram files better.
+	vector<Trace> res;
+	for(auto &c: corrs)
+	for(auto &d: c.diags)
+	for(auto &t: d.traces)
+	{
+		Trace r = t;
+		bool found=false;
+		for(size_t i=0; i<r.qls.size(); ++i)
+		{
+			if( find(res.begin(), res.end(), r) != res.end() )
+				found=true;
+			rotate( r.qls.begin(), r.qls.begin()+1, r.qls.end() );
+		}
+		if(!found)
+			res.push_back(t);
+	}
+
+	return res;
+}
+
+void Manager::cpu_code_output(ofstream &file, vector<Trace> need_to_compute)
+{
+  file << cpp_prefix();
+  ///The important bit, depends on diagrams!
+  vector<string> unique_mom, unique_disp, unique_gamma;
+  for(const auto& t : need_to_compute)
+    for(const auto& q : t.qls)
+    {
+      if(find(unique_mom.begin(), unique_mom.end(), q.mom) == unique_mom.end())
+        unique_mom.push_back(q.mom);
+      if(find(unique_disp.begin(), unique_disp.end(), q.displacement) == unique_disp.end())
+        unique_disp.push_back(q.displacement);
+      if(find(unique_gamma.begin(), unique_gamma.end(), q.gamma) == unique_gamma.end())
+        unique_gamma.push_back(q.gamma);
+    }
+
+  int max_size=0;
+  for(auto t : need_to_compute)
+    if(t.qls.size() > max_size)
+      max_size=t.qls.size();
+  ///collect diagrams of certain lengths 1,2,3,4,5,6,etc and save their strings
+  vector<int> idx_track(max_size,0);///tracks idx for each length
+  vector<int> res_idx;///for the result to pull the correct trace
+  vector<vector<Trace_Code_Data>> traces_by_size(max_size);
+  //for(auto t : tr)
+  for(size_t i=0; i<need_to_compute.size(); ++i)
+  {
+    auto t_size = need_to_compute[i].qls.size()-1;
+    traces_by_size[t_size].push_back(
+      Trace_Code_Data(need_to_compute[i].compute_name(unique_mom, unique_disp, unique_gamma), idx_track[t_size])
+                                    );
+    res_idx.push_back(idx_track[t_size]);
+    idx_track[t_size]++;
+  }
+  ///traces_by_size
+
+
+  for(size_t l=0; l<traces_by_size.size(); ++l)
+    if(traces_by_size[l].size()>0)
+      file << "std::vector<mat> res" << l+1 << "(" << traces_by_size[l].size()
+          << ");" << endl;
+
+  for(size_t l=0; l<traces_by_size.size(); ++l)
+  {
+    auto trs = traces_by_size[l];
+    if(l<2) ///Don't bother looking up precomputed values, don't exist if length = 1 or 2
+    {
+      for(size_t d=0; d<trs.size(); ++d)
+      {
+        file << "res" << l+1 << "[" << d << "]=";
+        //for(auto q : trs[d].compute_name)
+        for(size_t i=0; i<trs[d].compute_name.size(); ++i)
+        {
+          file << trs[d].compute_name[i];
+          if(i!=trs[d].compute_name.size()-1)
+            file << "*";
+          else
+            file << ";";
+        }
+        file << endl;
+      }
+    }
+    else
+    {
+      for(size_t d=0; d<trs.size(); ++d)
+      {
+        file << "res" << l+1 << "[" << d << "]=";
+
+        vector<string> computation = trs[d].compute_name;
+        bool max_cse=false;
+        ///Do a lookup to see if it's possible to substitute something that has
+        ///already been computed.  I want to check for the longest list of
+        ///mults down to mults of length 2.
+        ///This is not a perfect routine as it may substitute for example , A*B*C*D -> B*C even if A*B and C*D are computed.
+        for(size_t chk=l-1; chk>=1; chk--)///length of substitution to look for 1 is diagrams of lenth 2
+        {
+          for(size_t i=0; i<traces_by_size[chk].size(); ++i)///try them all
+          {
+            auto lookfor = traces_by_size[chk][i].compute_name;
+            auto search_res = search(computation.begin(), computation.end(),
+                                     lookfor.begin(), lookfor.end());
+            if( search_res != computation.end() )
+            {
+              ///If you found a substitution, put it before the elements,
+              ///refind the original mults, and remove them.
+              computation.insert( search_res, "res"+to_string(lookfor.size())+"["+to_string(i)+"]" );
+              search_res = search(computation.begin(), computation.end(),
+                                       lookfor.begin(), lookfor.end());
+              computation.erase( search_res, search_res + lookfor.size() );
+
+              trs[d].compute_name = computation;
+              if(trs[d].compute_name.size()==2)
+                max_cse=true;
+            }
+            if(max_cse)
+              break;
+          }
+          if(max_cse)
+            break;
+        }
+        ///now just output the new expression
+        for(size_t i=0; i<trs[d].compute_name.size(); ++i)
+        {
+          file << trs[d].compute_name[i];
+          if(i!=trs[d].compute_name.size()-1)
+            file << "*";
+          else
+            file << ";";
+        }
+        file << endl;
+
+      }
+    }
+  }
+
+  for(size_t d=0; d<need_to_compute.size(); ++d)
+    for(size_t l=0; l<traces_by_size.size(); ++l)
+      if(need_to_compute[d].qls.size()==(l+1))
+        file << "diag[" << d << "][dt][t] = res" << l+1 << "[" << res_idx[d] << "].trace();" << endl;
+
+  file << cpp_postfix();
+	
+}
+
+void Manager::diagram_names_output(ofstream &file, vector<Trace> need_to_compute)
+{
+	for(const auto &t: need_to_compute)
+		file << t.name() << endl;
+}
+
+
+void Manager::runtime_input_for_cpu(ofstream &file, vector<Trace> need_to_compute)
+{
+  vector<string> unique_mom, unique_disp, unique_gamma;
+  for(const auto& t : need_to_compute)
+    for(const auto& q : t.qls)
+    {
+      if(std::find(unique_mom.begin(), unique_mom.end(), q.mom) == unique_mom.end())
+        unique_mom.push_back(q.mom);
+      if(std::find(unique_disp.begin(), unique_disp.end(), q.displacement) == unique_disp.end())
+        unique_disp.push_back(q.displacement);
+      if(std::find(unique_gamma.begin(), unique_gamma.end(), q.gamma) == unique_gamma.end())
+        unique_gamma.push_back(q.gamma);
+    }
+
+  file << "nx " << lat.nx << endl;
+  file << "ny " << lat.ny << endl;
+  file << "nz " << lat.nz << endl;
+  file << "nt " << lat.nt << endl;
+  file << "nvec 100" << endl;
+  file << "cfg 100" << endl;
+  file << "ndiags " << need_to_compute.size() << endl;
+  file << "latname c44_b5.3_k0.158_100" << endl;
+  file << "unique_mom:length " << unique_mom.size() << endl;
+  for(size_t i=0; i<unique_mom.size(); ++i)
+    file << "unique_mom:" << i << " " << unique_mom[i] << endl;
+
+  file << "unique_gammas:length " << unique_gamma.size() << endl;
+  for(size_t i=0; i<unique_gamma.size(); ++i)
+    file << "unique_gammas:" << i << " " << unique_gamma[i] << endl;
+
+  file << "unique_displacement:length " << unique_disp.size() << endl;
+  for(size_t i=0; i<unique_disp.size(); ++i)
+    file << "unique_displacement:" << i << " " << unique_disp[i] << endl;
+}
+
+
+
+
 void Manager::shutdown()
 {
 	spdlog::shutdown();

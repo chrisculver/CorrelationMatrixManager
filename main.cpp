@@ -48,6 +48,28 @@ int main(int argc, char **argv)
 
 	run.wick_contractions();
 
+	try
+	{
+		///TODO: Currently all diagrams in one file, goes through the list
+		//sequentially, load's alot of data into memory, and searches a large map.
+		///Could create some clever system to look in different files corresponding 
+		///to the length of the diagram and load all those traces, then next size, etc.
+		run.load_numerical_results();
+	}
+	catch(vector<Trace> need_to_compute)
+	{
+		ofstream cpu_code("define_diagrams.cpp");
+		run.cpu_code_output(cpu_code, need_to_compute);	
+		cpu_code.close();
+
+		ofstream diag_names("diagram_names.txt");
+		run.diagram_names_output(diag_names, need_to_compute);
+		diag_names.close();
+
+		ofstream run_in("run_c44.in");
+		run.runtime_input_for_cpu(run_in, need_to_compute);
+		run_in.close();
+	}
 
 	run.shutdown();
 

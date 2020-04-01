@@ -4,7 +4,9 @@
 #include "OPS/operator.h"
 #include "DIAGS/correlator.h"
 
+#include <fstream>
 #include <string>
+#include <vector>
 
 ///Contains the ensemble specifications
 struct Lattice
@@ -27,6 +29,16 @@ struct FileNames
 
 	FileNames(){operator_filename="";diagram_filename="";};
 	FileNames(std::string o_f, std::string d_f):operator_filename(o_f),diagram_filename(d_f){};
+
+};
+
+
+struct Trace_Code_Data
+{
+  std::vector<std::string> compute_name;
+  int idx;///This may not be used anymore
+
+  Trace_Code_Data(std::vector<std::string> name, int idx):compute_name(name), idx(idx){};
 };
 
 
@@ -59,7 +71,15 @@ struct Manager
 	void wick_contractions();
 
 	///This function loads the diagrams from a file(s). 
-//	void load_diagrams();
+	void load_numerical_results();
+	
+	std::vector<Trace> traces_to_compute();
+	std::vector<Trace> traces_to_compute(const std::vector<std::string> computed_names);
+
+	void cpu_code_output(std::ofstream &file, std::vector<Trace> need_to_compute);
+	void diagram_names_output(std::ofstream &file, std::vector<Trace> need_to_compute);
+	void runtime_input_for_cpu(std::ofstream &file, std::vector<Trace> need_to_compute);
+
 
 	///This function multiplies traces and averages over time slices
 //	void compute_correlators();
