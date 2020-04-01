@@ -16,6 +16,9 @@ class Diagram
 	Diagram(int c, std::vector<Trace> t):coef(c), traces(t){};
 
 	std::string name() const;
+	std::vector<std::vector<Trace>> all_related_traces() const;
 };
+
+
 
 #endif

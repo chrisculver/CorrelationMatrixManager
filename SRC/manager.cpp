@@ -108,9 +108,6 @@ void Manager::create_logs()
   ///Just doing one extra type of output - debug/verbose
   auto wick_logger = spdlog::basic_logger_mt("wick", "logs/wick_"+cfg_to_string(lat.cfg)+".log"); 
 	auto op_logger = spdlog::basic_logger_mt("op", "logs/op_"+cfg_to_string(lat.cfg)+".log");
-	
-	wick_logger->set_level(spdlog::level::debug);
-	op_logger->set_level(spdlog::level::debug);
 }
 
 void Manager::load_operators()
@@ -170,6 +167,16 @@ void Manager::wick_contractions()
 {
 	for(auto &c: corrs)
 		c.wick_contract();
+
+	for(size_t i=0; i<ops.size(); ++i)
+	for(size_t j=0; j<ops.size(); ++j)
+	{
+		auto wick_logger = spdlog::get("wick");
+		std::string diag_names;
+		for(const auto &d: corrs[i*ops.size() + j].diags)
+			diag_names+=d.name()+"\n";	
+		wick_logger->info("Resulting diags for c_{}{} = \n{}", i, j, diag_names);
+	}
 }
 
 

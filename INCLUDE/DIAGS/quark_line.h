@@ -22,6 +22,9 @@ class QuarkLine
 			ti(i),gamma(g),displacement(d),mom(m),tf(f){};
 		QuarkLine(char i, Meson m, char f):
 			ti(i),gamma(m.gamma), displacement(m.displacement), mom(m.mom), tf(f){};
+
 };
+
+bool operator==(const QuarkLine &l, const QuarkLine &r);
 
 #endif

@@ -22,3 +22,12 @@ std::string Diagram::name() const
 
 	return name;
 }
+
+vector<vector<Trace>> Diagram::all_related_traces() const
+{
+	vector<vector<Trace>> res;
+	res.push_back(traces);	
+
+	return res;
+}
+

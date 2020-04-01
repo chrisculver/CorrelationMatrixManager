@@ -12,6 +12,9 @@ class Trace
 		std::vector<QuarkLine> qls;
 
 		std::vector<std::vector<std::complex<double>>> numerical_value;
+
 };
+
+bool operator==(const Trace &l, const Trace &r);
 
 #endif
