@@ -1,0 +1,10 @@
+latname CFG/c44_b5.3_k0.158_100
+nx 4
+ny 4
+nz 4
+nt 4
+nvec 10
+diagrams:length 3 
+diagrams:0  1 0 0 0 0   5 -1 0 0 1   5 1 0 0 1
+diagrams:1  1 0 0 0 0   5 1 0 0 1   5 -1 0 0 1
+diagrams:2  5 -1 0 0 0   5 1 0 0 1   5 1 0 0 0   5 -1 0 0 1

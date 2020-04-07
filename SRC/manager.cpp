@@ -403,10 +403,10 @@ void Manager::runtime_input_for_cpu(ofstream &file, vector<Trace> need_to_comput
   file << "ny " << lat.ny << endl;
   file << "nz " << lat.nz << endl;
   file << "nt " << lat.nt << endl;
-  file << "nvec 100" << endl;
+  file << "nvec 10" << endl;
   file << "cfg 100" << endl;
   file << "ndiags " << need_to_compute.size() << endl;
-  file << "latname c44_b5.3_k0.158_100" << endl;
+  file << "latname CFG/c44_b5.3_k0.158_100" << endl;
   file << "unique_mom:length " << unique_mom.size() << endl;
   for(size_t i=0; i<unique_mom.size(); ++i)
     file << "unique_mom:" << i << " " << unique_mom[i] << endl;
@@ -421,7 +421,21 @@ void Manager::runtime_input_for_cpu(ofstream &file, vector<Trace> need_to_comput
 }
 
 
+void Manager::compute_time_average_correlators()
+{
+	for(auto &c: corrs)
+		c.compute_time_average_correlators(lat.nt);	
+}
 
+void Manager::print_correlators()
+{
+	for(const auto &c: corrs)
+	{
+		for(const auto &t : c.corr_t)
+			cout << t << endl;
+		cout << endl;
+	}
+}
 
 void Manager::shutdown()
 {

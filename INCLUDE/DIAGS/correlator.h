@@ -24,6 +24,8 @@ class Correlator
 		
 		using Saved_Traces = std::map<std::string, std::vector<std::vector<std::complex<double>>> >;
 		void load_numerical_results(Saved_Traces computed); 
+
+		void compute_time_average_correlators(int NT);
 };
 
 #endif

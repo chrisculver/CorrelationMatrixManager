@@ -13,6 +13,10 @@ void Correlator::wick_contract()
 	for(const auto &a_e: a.terms)
 	{
 		new_diags=wick_contract_elems(c_e, a_e);
+		///First consolidate the diagrams returned amongst themselves.
+				
+
+		
 		///push some diags into diags
 		///not duplicating elements
 		for(const auto &d: new_diags)
@@ -31,13 +35,19 @@ void Correlator::wick_contract()
 				}			
 			}
 			if(!found)
-				diags.push_back(d);		
+				diags.push_back(d);	
+			
+
 
 		}
 	}
+	for(auto it = diags.begin(); it != diags.end(); it++)
+		if( (*it).coef == 0)
+			diags.erase(it--);
 
   for(auto &d: diags)
     d.coef = d.coef*c.coef*a.coef;
+	
 }
 
 
@@ -74,4 +84,28 @@ void Correlator::load_numerical_results(Saved_Traces computed)
       }
     }
   }
+}
+
+
+void Correlator::compute_time_average_correlators(int NT)
+{
+  corr_t.resize(NT);
+	for(int dt=0; dt<NT; ++dt)
+  {
+    complex<double> time_avg = 0.;
+    for(int t=0; t<NT; ++t)
+    {
+      for(const auto& d : diags)
+      {
+        complex<double> trace_product = 1.;
+        for(const auto& tr : d.traces)
+        {
+          trace_product *= tr.numerical_value[dt][t];
+        }///end traces
+        time_avg += double(d.coef)*trace_product;
+      }///end diags
+    }///end t
+    corr_t[dt] = time_avg/(double(NT));
+  }///end dt
+	
 }

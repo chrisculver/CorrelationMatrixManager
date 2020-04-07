@@ -1,0 +1,4 @@
+
+-I ./SRC/
+-I /Users/chris/Code/Libraries/gwu-qcd/include/
+-I /Users/chris/Code/Libraries/eigen3/

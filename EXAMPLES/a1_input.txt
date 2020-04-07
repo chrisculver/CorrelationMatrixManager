@@ -1,0 +1,8 @@
+nx 4
+ny 4
+nz 4
+nt 4
+cfg 100
+verbose_logging 1
+operator_filename a1_2448_test.txt
+diagram_filename temp.dat

@@ -69,7 +69,13 @@ int main(int argc, char **argv)
 		ofstream run_in("run_c44.in");
 		run.runtime_input_for_cpu(run_in, need_to_compute);
 		run_in.close();
+
+		return 1;
 	}
+
+	run.compute_time_average_correlators();
+
+	run.print_correlators();
 
 	run.shutdown();
 
