@@ -122,7 +122,7 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 				}
 			}
 			
-			cout << endl;
+//			cout << endl;
 		  if(all_signs[i])
         d.coef=1;
       else
@@ -134,11 +134,11 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 		}
 	}		
 	
-	cout << "The following diagrams are being added to the correlator\n";
-	for(const auto &d: res)
-	{
-		cout << d.name() << "\n";
-	}
+//	cout << "The following diagrams are being added to the correlator\n";
+//	for(const auto &d: res)
+//	{
+//		cout << d.name() << "\n";
+//	}
 
 
 	return res;

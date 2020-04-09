@@ -14,8 +14,6 @@ void Correlator::wick_contract()
 	{
 		new_diags=wick_contract_elems(c_e, a_e);
 		///First consolidate the diagrams returned amongst themselves.
-				
-
 		
 		///push some diags into diags
 		///not duplicating elements
