@@ -39,8 +39,9 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 	wick_logger->debug("Beginning heaps algorithm");
 	vector<vector<ShortQuark>> all_barred_permutations;
 	vector<bool> all_signs;
+	bool starting_sign = true;
 	heaps_algorithm_anticommuting( all_barred_permutations, barred, barred.size(), 
-																 all_signs, true );
+																 all_signs, starting_sign );
 	wick_logger->debug("Finished heaps algorithm");
 	
 //	cout << "Printing all_permutations of the barred quarks\n";
@@ -70,30 +71,65 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 
 		if(contractable)
 		{
-			cout << "quark_list = ";
-			char starting_meson = unbarred[0].label;
 			Diagram d;
 			Trace t;
-			for(size_t q=0; q<unbarred.size(); ++q)
+			vector<bool> q_contracted(unbarred.size(), false);
+			bool all_contracted = false;
+			bool new_trace_loop = false;
+			int q = 0;///current quark we are on, start at beginning
+			///Start at quark q=0.  Make the quark line for unbarred to barred. 
+			///Find the quark it goes to next by label.  
+			///Exit when all quarks are used
+			char starting_meson = unbarred[q].label;
+			while(!all_contracted)
 			{
-				cout << unbarred[q].barred << "-" << unbarred[q].flavor << "_" << unbarred[q].label << " ";
-				cout << lst[q].barred << "-" << lst[q].flavor << "_" << lst[q].label << " ";
-
-				Meson m = meson_map[unbarred[q].label];
-				t.qls.push_back(QuarkLine( time_map[unbarred[q].label], m, time_map[lst[q].label] ));
+//				cout << "q=" << q << "  |  m.label=" << lst[q].label << "  |  starting_meson=" << starting_meson << endl;
+				Meson m = meson_map[unbarred[q].label];			
+				t.qls.push_back( QuarkLine(time_map[unbarred[q].label], m, time_map[lst[q].label]) );
+				q_contracted[q]=true;
 				
-				if(lst[q].label == starting_meson)
+				if(lst[q].label == starting_meson)	
 				{
 					d.traces.push_back(t);
 					t.qls.clear();
-					starting_meson = unbarred[(q+1)%unbarred.size()].label;///does the mod need to be there?
+					new_trace_loop = true;
+				}
+
+				all_contracted=true;
+				for(size_t i=0; i<q_contracted.size(); ++i)
+					all_contracted = all_contracted && q_contracted[i];
+				
+				///Find the meson we are attached to.
+				if(new_trace_loop)
+				{
+					for(size_t i=0; i<unbarred.size(); ++i)
+						if(q_contracted[i]==false)
+						{
+							starting_meson = unbarred[i].label;
+							q=i;
+							new_trace_loop=false;
+							break;
+						}
+				}
+				else
+				{
+					for(size_t i=0; i<unbarred.size(); ++i)
+						if(lst[q].label == unbarred[i].label)
+						{	
+							q=i;
+							break;
+						}
 				}
 			}
+			
 			cout << endl;
 		  if(all_signs[i])
         d.coef=1;
       else
         d.coef=-1;  
+
+				
+
       res.push_back(d);
 		}
 	}		

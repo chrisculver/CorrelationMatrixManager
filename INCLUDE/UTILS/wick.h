@@ -30,8 +30,9 @@ std::vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp
 template <class T>
 void heaps_algorithm_anticommuting(
 		std::vector< std::vector<T> > &dest, std::vector<T> &src, int size, 
-		std::vector<bool> &coef, bool c)
+		std::vector<bool> &coef, bool &c)
 {
+	
 	if(size==1)
 	{
 		dest.push_back(src);
@@ -41,14 +42,14 @@ void heaps_algorithm_anticommuting(
 	for(int i=0; i<size; ++i)
 	{
 		heaps_algorithm_anticommuting(dest, src, size-1, coef, c);
-
-		std::vector<T> old_src=src;
+		std::vector<T> old_src = src;
+		
 		if(size%2==1)
 			iter_swap(src.begin(), src.begin() + size - 1);
 		else
 			iter_swap(src.begin() + i, src.begin() + size - 1);
 		if( src != old_src )
-			c=!c;
+			c = !c;
 	}
 }
 

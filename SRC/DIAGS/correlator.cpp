@@ -21,13 +21,13 @@ void Correlator::wick_contract()
 		///not duplicating elements
 		for(const auto &d: new_diags)
 		{
-			auto equivalent_traces = d.all_related_traces();
+			auto equivalent_diags = d.all_cyclic_related_diagrams();
 			int same_diagram=-1;
 			bool found=false;
-			for(size_t t=0; t<equivalent_traces.size(); ++t)
+			for(size_t t=0; t<equivalent_diags.size(); ++t)
 			for(size_t e=0; e<diags.size(); ++e)
 			{
-				if(equivalent_traces[t]==(diags[e].traces))
+				if(equivalent_diags[t]==(diags[e].traces))
 				{
 					found=true;
 					diags[e].coef+=d.coef;
