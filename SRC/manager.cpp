@@ -72,7 +72,8 @@ void Manager::load_input(string input_filename)
 	main_logger->info("Loaded lattice data\nnx={} | ny={} | nz={} | nt={} | cfg={}\n",
 										 lat.nx, lat.ny, lat.nz, lat.nt, cfg_to_string(lat.cfg));	
 	
-	files = FileNames(name_value["operator_filename"], name_value["diagram_filename"]);
+	files = FileNames(name_value["operator_filename"], "diags_"+to_string(lat.nx)+to_string(lat.ny)
+				+to_string(lat.nz)+to_string(lat.nt)+"_"+cfg_to_string(lat.cfg)+".dat");
 	name_value.erase("operator_filename");
 	name_value.erase("diagram_filename");	
 
@@ -429,11 +430,13 @@ void Manager::compute_time_average_correlators()
 
 void Manager::print_correlators()
 {
-	for(const auto &c: corrs)
+	for(size_t i=0; i<ops.size(); ++i)
+	for(size_t j=0; j<ops.size(); ++j)
 	{
-		for(const auto &t : c.corr_t)
-			cout << t << endl;
-		cout << endl;
+		ofstream corr_file;
+		corr_file.open("corr_op."+to_string(i)+"_op."+to_string(j)+"_"+cfg_to_string(lat.cfg)+".dat");
+		for(const auto &t : corrs[i*ops.size() + j].corr_t)
+			corr_file << t << endl;
 	}
 }
 
