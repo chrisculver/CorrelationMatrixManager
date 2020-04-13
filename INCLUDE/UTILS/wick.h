@@ -27,6 +27,26 @@ struct ShortQuark
 
 std::vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c);
 
+
+template <class T>
+void heaps_algorithm(
+		std::vector< std::vector<T> > &dest, std::vector<T> &src, int size
+		)
+{
+	if(size==1)
+		dest.push_back(src);
+
+	for(int i=0; i<size; ++i)
+	{
+		heaps_algorithm(dest, src, size-1);
+		if(size%2==1)
+			iter_swap(src.begin(), src.begin() + size - 1);
+		else
+			iter_swap(src.begin() + i, src.begin() + size - 1);
+	}
+}
+
+
 template <class T>
 void heaps_algorithm_anticommuting(
 		std::vector< std::vector<T> > &dest, std::vector<T> &src, int size, 
@@ -45,11 +65,15 @@ void heaps_algorithm_anticommuting(
 		std::vector<T> old_src = src;
 		
 		if(size%2==1)
+		{
 			iter_swap(src.begin(), src.begin() + size - 1);
+		}
 		else
+		{
 			iter_swap(src.begin() + i, src.begin() + size - 1);
-		if( src != old_src )
-			c = !c;
+		}
+		if( src != old_src)
+			c=!c;
 	}
 }
 

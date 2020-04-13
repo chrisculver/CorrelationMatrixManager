@@ -43,22 +43,30 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 	heaps_algorithm_anticommuting( all_barred_permutations, barred, barred.size(), 
 																 all_signs, starting_sign );
 	wick_logger->debug("Finished heaps algorithm");
-	
-//	cout << "Printing all_permutations of the barred quarks\n";
+	/*
+	cout << "Printing all_permutations of the barred quarks\n";
 //	if(spdlog::logger::level() == spdlog::level::debug)
 //	{
 		std::string all_permutes_string;
-		for(const auto &l: all_barred_permutations)
+		for(size_t i=0; i<all_barred_permutations.size(); ++i)
 		{
-			for(const auto &q: l)
+			const auto l = all_barred_permutations[i];
+			all_permutes_string += to_string(all_signs[i]) + "  ";
+			for(size_t j=0; j<l.size(); ++j)
+			{
+				const auto qbar = l[j];
+				const auto q = unbarred[j];
+				all_permutes_string += to_string(qbar.barred)+"-"+qbar.flavor+"_"+qbar.label+" ";
 				all_permutes_string += to_string(q.barred)+"-"+q.flavor+"_"+q.label+" ";
+			
+			}
 			all_permutes_string += "\n";
 		}
-//		cout << all_permutes_string << endl;
+		cout << all_permutes_string << endl;
 		//wick_logger->debug("Printing all_barred_permutations\n{}", all_permutes_string);
 //	}
-//	cout << "printed all permutations\n";
-	
+	cout << "printed all permutations\n";
+	*/
 	vector<Diagram> res;
 	for(size_t i=0; i<all_barred_permutations.size(); ++i)
 	{
@@ -124,9 +132,9 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 			
 //			cout << endl;
 		  if(all_signs[i])
-        d.coef=1;
+        d.coef=a.coef*c.coef;
       else
-        d.coef=-1;  
+        d.coef=-1*a.coef*c.coef;  
 
 				
 

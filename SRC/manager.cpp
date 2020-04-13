@@ -166,8 +166,16 @@ void Manager::load_operators()
 
 void Manager::wick_contractions()
 {
-	for(auto &c: corrs)
-		c.wick_contract();
+//	for(auto &c: corrs)
+//		c.wick_contract();
+	for(size_t i=0; i<ops.size(); ++i)
+	for(size_t j=0; j<ops.size(); ++j)
+	{
+	//	cout << "wick contraction for c_ij = " << i << " " << j << endl;
+		corrs[i*ops.size() +j].wick_contract();
+	//	cout << endl;
+	}
+
 
 	for(size_t i=0; i<ops.size(); ++i)
 	for(size_t j=0; j<ops.size(); ++j)

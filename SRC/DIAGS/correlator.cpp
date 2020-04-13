@@ -23,29 +23,29 @@ void Correlator::wick_contract()
 			int same_diagram=-1;
 			bool found=false;
 			for(size_t t=0; t<equivalent_diags.size(); ++t)
-			for(size_t e=0; e<diags.size(); ++e)
 			{
-				if(equivalent_diags[t]==(diags[e].traces))
+				if(!found)
 				{
-					found=true;
-					diags[e].coef+=d.coef;
-					break;
-				}			
+					for(size_t e=0; e<diags.size(); ++e)
+					{
+						if( (equivalent_diags[t]==(diags[e].traces)) && !found)
+						{
+							found=true;
+							diags[e].coef+=d.coef;
+						}			
+					}
+				}
 			}
 			if(!found)
 				diags.push_back(d);	
-			
-
 
 		}
 	}
+
 	for(auto it = diags.begin(); it != diags.end(); it++)
 		if( (*it).coef == 0)
 			diags.erase(it--);
 
-  for(auto &d: diags)
-    d.coef = d.coef*c.coef*a.coef;
-	
 }
 
 

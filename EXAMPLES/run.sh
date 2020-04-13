@@ -1,6 +1,6 @@
 #!/bin/bash
 
-in_file=a1_input.txt
+in_file=${1}
 
 ./compute_correlation_matrix ${in_file}
 res=$?
