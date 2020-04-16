@@ -444,7 +444,7 @@ void Manager::print_correlators()
 		ofstream corr_file;
 		corr_file.open("corr_op."+to_string(i)+"_op."+to_string(j)+"_"+cfg_to_string(lat.cfg)+".dat");
 		for(const auto &t : corrs[i*ops.size() + j].corr_t)
-			corr_file << t << endl;
+			corr_file << t.real() << " " << t.imag() << endl;
 	}
 }
 

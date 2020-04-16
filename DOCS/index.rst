@@ -6,10 +6,8 @@
 Home
 ====
 
-This code is written as an add-on to the gwu-qcd library.  It takes as input information
-about a lattice and a list of operators.  It then manages the computation of the correlation
-matrix, exiting if wick contractions or numerical evaluation of diagrams are missing.
-
+This code manages the correlation matrix for hadron spectroscopy calculations.  It is currently
+specialized to mesonic operators.  
 
 ..  toctree::
     :caption: User Guide
