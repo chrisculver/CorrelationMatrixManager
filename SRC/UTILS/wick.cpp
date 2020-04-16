@@ -40,10 +40,10 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 	vector<vector<ShortQuark>> all_barred_permutations;
 	vector<bool> all_signs;
 	bool starting_sign = false;
-	cout << "Starting heaps algorithm, unbarred quark list is \n";
-	for(size_t i=0; i<unbarred.size(); ++i)
-		cout << unbarred[i].barred << "-" << unbarred[i].flavor << "_" << unbarred[i].label << " ";
-	cout << endl;
+	//cout << "Starting heaps algorithm, unbarred quark list is \n";
+	//for(size_t i=0; i<unbarred.size(); ++i)
+	//	cout << unbarred[i].barred << "-" << unbarred[i].flavor << "_" << unbarred[i].label << " ";
+	//cout << endl;
 	heaps_algorithm_anticommuting( all_barred_permutations, barred, barred.size(), 
 																 all_signs, starting_sign );
 	wick_logger->debug("Finished heaps algorithm");
@@ -143,7 +143,7 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 			///We used a list \bar{q} q \cdots \bar{q} q but props are
 			///formed from q \bar{q}, -1^N_mesons factor needs to be applied
 			int tot_mesons = a.mesons.size() + c.mesons.size();
-			cout << "tot_mesons = " << tot_mesons << "   " << (tot_mesons%2) << endl;
+			//cout << "tot_mesons = " << tot_mesons << "   " << (tot_mesons%2) << endl;
 			if( (tot_mesons%2) != 0)
 				d.coef*=-1;
 
