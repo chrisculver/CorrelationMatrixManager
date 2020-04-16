@@ -4,6 +4,7 @@
 #include "DIAGS/diagram.h"
 #include "OPS/elemental_op.h"
 
+#include <iostream>
 #include <vector>
 
 struct ShortQuark
@@ -63,7 +64,13 @@ void heaps_algorithm_anticommuting(
 	{
 		heaps_algorithm_anticommuting(dest, src, size-1, coef, c);
 		std::vector<T> old_src = src;
-		
+
+		using std::cout; using std::endl;
+		cout << "List before swap\n";
+		cout << c << " ";
+		for(size_t i=0; i<src.size(); ++i)
+			cout << src[i].barred << "-" << src[i].flavor << "_" << src[i].label << " ";
+		cout << endl;
 		if(size%2==1)
 		{
 			iter_swap(src.begin(), src.begin() + size - 1);
@@ -74,6 +81,13 @@ void heaps_algorithm_anticommuting(
 		}
 		if( src != old_src)
 			c=!c;
+		
+		cout << "List after swap\n";
+		cout << c << " ";
+		for(size_t i=0; i<src.size(); ++i)
+			cout << src[i].barred << "-" << src[i].flavor << "_" << src[i].label << " ";
+		cout << endl << endl << endl;
+
 	}
 }
 
