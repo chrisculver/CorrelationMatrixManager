@@ -30,18 +30,16 @@ def configureDoxyfile(input_dir, output_dir):
 # Check if we're running on Read the Docs' servers
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
-breathe_projects = {}
 if read_the_docs_build:
 	input_dir = '..'
 	output_dir = 'build'
 	configureDoxyfile(input_dir, output_dir)
 	subprocess.call('doxygen', shell=True)
-	breathe_projects['ComputeCorrelationMatrix'] = output_dir + '/xml'
-
+	breathe_projects['CorrelationMatrixManager'] = output_dir + '/xml'
 
 # -- Project information -----------------------------------------------------
 
-project = 'ComputeCorrelationMatrix'
+project = 'CorrelationMatrixManager'
 author = 'Chris Culver'
 
 
@@ -78,4 +76,4 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # Breathe Configuration
-breathe_default_project = "ComputeCorrelationMatrix"
+breathe_default_project = "CorrelationMatrixManager"

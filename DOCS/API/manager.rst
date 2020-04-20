@@ -5,7 +5,7 @@ The computation is broken down into the following components
 
 These are all handled by the Spectroscopy class.
 
-..  doxygenclass:: Spectroscopy
+..  doxygenclass:: CorrelationMatrixManager
     :members:
 
 Under this class is a class to hold each correlation function.
