@@ -46,44 +46,31 @@ int main(int argc, char **argv)
   {
     outfile << "diagrams:" << n << "  ";
     n++;
-    auto split_line = split(l, '|');
+		auto split_endpoint = split(l, ']');
+    auto split_line = split(split_endpoint[0], '|');
     for(auto s : split_line)
     {
       auto term = split(s,' ');
-		//	if(term[0]!="[")
-		//	{	
-		//		outfile << gamma(term[0]) << " ";
-		//		outfile << term[2] << " " << term[3] << " " << term[4];
-		//		outfile << term[5] << " ";
-		//	}
-		//	else
-		//	{
+
+			if(term.size()==8)	
+			{	
 				outfile << term[1] << " ";
 				outfile << term[3] << " " << term[4] << " " << term[5] << " ";
 				outfile << time(term[6]) << " ";
-		//	}
+			}
+			else if(term.size()==9)	
+			{	
+				if(term[1]=="1" && term[2]=="5")
+					outfile << "11 ";
+				else if(term[1]=="2" && term[2]=="5")
+					outfile << "12 ";
+				else if(term[1]=="3" && term[2]=="5")
+					outfile << "13 ";
+				
+				outfile << term[4] << " " << term[5] << " " << term[6] << " ";
+				outfile << time(term[7]) << " ";
+			}
 			
-			/*
-      for(auto t : term)
-      {
-        if(t=="\\Gamma_5")
-          outfile << "5";
-				else if(t=="\\Gamma_x")
-					outfile << "1";
-        else if(t=="t_f")
-          outfile << "1";
-        else if(t=="t")
-          outfile << "0";
-        else if( (t=="[") || (t=="]") ){}
-				else if( t=="\\delta_{ii}") {}
-        else
-          outfile << t;
-
-        if(t!=term.back())
-          outfile << " ";
-        else
-          outfile << "   ";
-      }*/
     }
     outfile << endl;
   }
