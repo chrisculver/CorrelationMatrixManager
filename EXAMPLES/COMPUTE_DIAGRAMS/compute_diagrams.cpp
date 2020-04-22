@@ -188,17 +188,24 @@ int main(int argc, char** argv)
   {
     step& s = steps[i];
     if(s.gamma==5)
-      printf("\\Gamma_5 ");
+      printf("5 ");
     else if(s.gamma==6)
-      printf("\\identity ");
+      printf("6 ");
     else if(s.gamma==1)
-      printf("\\Gamma_1 ");
+      printf("1 ");
+		else if(s.gamma==11)
+			printf("1 5 ");
+		printf("\\delta_{ii} ");
     printf("%d %d %d ", s.p[0], s.p[1], s.p[2]);
     if(s.t==0)
-      printf("t");
+      printf("i ");
     else if(s.t==1)
-      printf("t_f");
-    if(i<steps.size()-1) printf(" | "); else printf(" ]\n");
+      printf("f ");
+		if(steps[(i+1)%steps.size()].t==0)
+			printf("i ");
+		else
+			printf("f ");
+    if(i<steps.size()-1) printf("| "); else printf("]\n");
   }
   for(int dt=0; dt<m.nt; ++dt)
   {
