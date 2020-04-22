@@ -317,15 +317,15 @@ int main(int argc, char **argv)
             ql_fin[g*ndisp*nmom + d*nmom + p] = mpart.m*tmp_fin.m;
 */
             tensmat mpart(nvec);
-            get_matrix(m, tf, t, mpart);
-            ql_forward[g*ndisp*nmom + d*nmom + p] = mpart.m*tmp_init.m;
             get_matrix(m, t, tf, mpart);
-            ql_backward[g*ndisp*nmom + d*nmom + p] = mpart.m*tmp_fin.m;
+            ql_forward[g*ndisp*nmom + d*nmom + p] = tmp_init.m*mpart.m;
+            get_matrix(m, tf, t, mpart);
+            ql_backward[g*ndisp*nmom + d*nmom + p] = tmp_fin.m*mpart.m;
             ///TODO CHECK MATH IS CORRECT
             get_matrix(m, t, t, mpart);
-            ql_init[g*ndisp*nmom + d*nmom + p] = mpart.m*tmp_init.m;
+            ql_init[g*ndisp*nmom + d*nmom + p] = tmp_init.m*mpart.m;
             get_matrix(m, tf, tf, mpart);
-            ql_fin[g*ndisp*nmom + d*nmom + p] = mpart.m*tmp_fin.m;
+            ql_fin[g*ndisp*nmom + d*nmom + p] = tmp_fin.m*mpart.m;
           }///end of mom
         }///end of displacement
       }///end of gammas
