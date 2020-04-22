@@ -47,18 +47,18 @@ void Correlator::wick_contract()
 			diags.erase(it--);
 
 	///Include the p/m coefficient of the annihilation meson
-	auto op_coef = 1;
 	auto a_mesons = a.terms[0].mesons;
+	int pm_coef = pow(-1,a_mesons.size());
 	for(const auto &m : a_mesons)
 	{	
 		auto g = m.gamma;
-		if( (g=="5") || (g=="1") || (g=="2") || (g=="3") )
-			op_coef*=-1;
+		if( (g=="5") || (g=="1") || (g=="2") || (g=="3") || (g=="1 5") || (g=="2 5") || (g=="3 5") )
+			pm_coef*=-1;
 	}
 
-	if(op_coef*=-1)
+	if(pm_coef*=-1)
 		for(auto &d : diags)
-			d.coef*=op_coef;
+			d.coef*=pm_coef;
 }
 
 
@@ -103,17 +103,17 @@ void Correlator::compute_time_average_correlators(int NT)
   corr_t.resize(NT);
 	for(int dt=0; dt<NT; ++dt)
   {
-    complex<double> time_avg = 0.;
+    complex<double> time_avg(0.,0.);
     for(int t=0; t<NT; ++t)
     {
       for(const auto& d : diags)
       {
-        complex<double> trace_product = 1.;
+        complex<double> trace_product(1.,0.);
         for(const auto& tr : d.traces)
         {
           trace_product *= tr.numerical_value[dt][t];
         }///end traces
-        time_avg += double(d.coef)*trace_product;
+        time_avg += complex<double>(d.coef,0)*trace_product;
       }///end diags
     }///end t
     corr_t[dt] = time_avg/(double(NT));
