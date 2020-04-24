@@ -30,48 +30,30 @@ std::string Diagram::name() const
 
 vector<vector<Trace>> Diagram::all_cyclic_related_diagrams() const
 {
-	vector<vector<Trace>> outer_permuted, res;
-	auto rot = traces;
-//	res.push_back(traces);
-//	cout << "finding all related diags of " << endl;
-//	cout << name() << endl << endl;
+	///This finds ALL diagrams that are related by cyclic permutations. 
+	/// [ A B ] [ C D ]
+	/// First we make all permutations of the traces, i.e.
+	/// { [ A B ] [ C D ] , [ C D ] [ B A ]}
+	/// For each of these lists find 
 
-	heaps_algorithm(outer_permuted, rot, rot.size());
+	///the vector of traces the algorithm starts at
+	auto start = traces;
+	vector<vector<vector<Trace>>> tmp(start.size()+1);
 
-	for(size_t i=0; i<outer_permuted.size(); ++i)
+	heaps_algorithm(tmp[0], start, start.size());	
+
+
+	for(size_t i=0; i<start.size(); ++i)
 	{
-		for(size_t j=0; j<outer_permuted[i].size(); ++j)
+	
+		for(size_t lst=0; lst<tmp[i].size(); ++lst)
+		for(size_t j=0; j<tmp[i][lst][i].qls.size(); ++j)
 		{
-			for(size_t k=0; k<outer_permuted[i][j].qls.size(); ++k)
-			{
-				rotate(outer_permuted[i][j].qls.begin(), outer_permuted[i][j].qls.begin()+1, outer_permuted[i][j].qls.end());
-				res.push_back(outer_permuted[i]);
-			}
+			rotate(tmp[i][lst][i].qls.begin(), tmp[i][lst][i].qls.begin()+1, tmp[i][lst][i].qls.end());
+			tmp[i+1].push_back(tmp[i][lst]);
 		}
+	
 	}
 
-
-//
-//	for(size_t i=0; i<rot.size(); ++i)
-//	{
-//		rotate(rot.begin(), rot.begin()+1, rot.end());
-//		for(size_t j=0; j<rot.size(); ++j)
-//		{
-//			for(size_t k=0; k<rot[j].qls.size(); ++k)
-//			{
-//				res.push_back(rot);
-//				rotate(rot[j].qls.begin(), rot[j].qls.begin()+1, rot[j].qls.end());
-//			}
-//		}
-//	}
-	
-	
-	for(size_t i=0; i<res.size(); ++i)
-	{
-//		for(size_t j=0; j<res[i].size(); ++j)
-//			cout << res[i][j].name() << " ";
-//		cout << endl;
-	}
-
-	return res;
+	return tmp[start.size()];
 }

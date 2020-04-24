@@ -1,0 +1,2 @@
+1|u,1,\delta_{ii},0 0 0,u+-1|d,1,\delta_{ii},0 0 0,d
+1|d,5,\delta_{ii},1 0 0,u|u,5,\delta_{ii},-1 0 0,d+-1|d,5,\delta_{ii},-1 0 0,u|u,5,\delta_{ii},1 0 0,d
