@@ -132,11 +132,10 @@ void Manager::load_operators()
 		op_logger->debug("Read line = {}",line);
 
 		auto op_sum = split(line, '+');
-    int coef;
     for(const auto term:op_sum)
     {
       auto meson_text = split(term, '|');
-			coef = stoi(meson_text[0]); 
+			int coef = stoi(meson_text[0]); 
 			meson_text.erase(meson_text.begin(), meson_text.begin()+1);
       vector<Meson> ms;
       for(const auto meson:meson_text)
@@ -146,7 +145,7 @@ void Manager::load_operators()
       }
       elems.push_back(ElementalOp(coef, ms));
     }
-    ops.push_back(Operator(coef,elems));
+    ops.push_back(Operator(elems));
 	} 
   op_file.close();
 	
@@ -155,9 +154,14 @@ void Manager::load_operators()
 	for(size_t i=0; i<ops.size(); ++i)
 		main_logger->info("Operator {} = {}", i, ops[i]);
 
+	main_logger->info("The adjoint operators are");
+	for(size_t i=0; i<ops.size(); ++i)
+		main_logger->info("Adjoint operator {} = {}", i, adjoint(ops[i]));
+	
 	for(const auto &c : ops)
 		for(const auto &a : ops)
 			corrs.push_back( Correlator(adjoint(a), c) );
+
 
 	op_logger->flush();
 	main_logger->flush();

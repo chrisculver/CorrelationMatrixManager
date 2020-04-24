@@ -136,9 +136,9 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 			
 //			cout << endl;
 		  if(all_signs[i])
-        d.coef=a.coef*c.coef;
+        d.coef=-1*a.coef*c.coef;
       else
-        d.coef=-1*a.coef*c.coef;  
+        d.coef=a.coef*c.coef;  
 
 			///We used a list \bar{q} q \cdots \bar{q} q but props are
 			///formed from q \bar{q}, -1^N_mesons factor needs to be applied

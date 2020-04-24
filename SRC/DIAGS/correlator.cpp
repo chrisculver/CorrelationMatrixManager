@@ -46,19 +46,6 @@ void Correlator::wick_contract()
 		if( (*it).coef == 0)
 			diags.erase(it--);
 
-	///Include the p/m coefficient of the annihilation meson
-	auto a_mesons = a.terms[0].mesons;
-	int pm_coef = pow(-1,a_mesons.size());
-	for(const auto &m : a_mesons)
-	{	
-		auto g = m.gamma;
-		if( (g=="5") || (g=="1") || (g=="2") || (g=="3") || (g=="1 5") || (g=="2 5") || (g=="3 5") )
-			pm_coef*=-1;
-	}
-
-	if(pm_coef*=-1)
-		for(auto &d : diags)
-			d.coef*=pm_coef;
 }
 
 
