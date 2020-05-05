@@ -1,6 +1,7 @@
 #include "DIAGS/correlator.h"
 #include "UTILS/wick.h"
 
+#include <iostream>
 #include <algorithm>
 
 using namespace std;

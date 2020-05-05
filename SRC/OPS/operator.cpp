@@ -10,9 +10,7 @@ Operator adjoint(const Operator o)
 
 
 	///Include the p/m coefficient due to (gamma_4 GAMMA^{\dagger} gamma_4)
-	///also each meson swaps the quarks picking up a minus sign.
 	auto a_mesons = a.terms[0].mesons;
-	auto pm_coef = 1;
 	for(const auto &m : a_mesons)
 	{	
 	  pm_coef *= -1;

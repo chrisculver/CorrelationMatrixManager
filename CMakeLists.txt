@@ -9,9 +9,8 @@ file(GLOB SOURCES "SRC/*.cpp" "SRC/UTILS/*.cpp" "SRC/OPS/*.cpp" "SRC/DIAGS/*.cpp
 add_executable(compute_correlation_matrix ${SOURCES})
 
 #include GWU-QCD library
-find_library(GWUQCDlib libqcd.a $ENV{HOME}/Code/Libraries/gwu-qcd/lib/)
 find_library(SPDLOG libspdlog.a $ENV{HOME}/Code/Libraries/spdlog/build/)
-target_link_libraries(compute_correlation_matrix ${GWUQCDlib} ${SPDLOG})
+target_link_libraries(compute_correlation_matrix ${SPDLOG})
 
 
 set_target_properties(

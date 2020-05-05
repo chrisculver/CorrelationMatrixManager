@@ -163,10 +163,15 @@ int main(int argc, char** argv)
   gamma[4].resize(4,4); gamma[4] << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, -1;
 #endif
   // anti-milc basis
-  gamma[1].resize(4,4); gamma[1] << 0, 0, 0, -I, 0, 0, -I, 0, 0, I, 0, 0, I, 0, 0, 0;
+  //gamma[1].resize(4,4); gamma[1] << 0, 0, 0, -I, 0, 0, -I, 0, 0, I, 0, 0, I, 0, 0, 0;
+  //gamma[2].resize(4,4); gamma[2] << 0, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, 1, 0, 0, 0;
+  //gamma[3].resize(4,4); gamma[3] << 0, 0, -I, 0, 0, 0, 0, I, I, 0, 0, 0, 0, -I, 0, 0;
+  //gamma[4].resize(4,4); gamma[4] << 0, 0, -1, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, 0;
+  // euclidean gammas
+  gamma[1].resize(4,4); gamma[1] << 0, 0, 0, I, 0, 0, I, 0, 0, -I, 0, 0, -I, 0, 0, 0;
   gamma[2].resize(4,4); gamma[2] << 0, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, 1, 0, 0, 0;
-  gamma[3].resize(4,4); gamma[3] << 0, 0, -I, 0, 0, 0, 0, I, I, 0, 0, 0, 0, -I, 0, 0;
-  gamma[4].resize(4,4); gamma[4] << 0, 0, -1, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, 0;
+  gamma[3].resize(4,4); gamma[3] << 0, 0, I, 0, 0, 0, 0, -I, -I, 0, 0, 0, 0, I, 0, 0;
+  gamma[4].resize(4,4); gamma[4] << 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0;  
   gamma[5] = gamma[1]*gamma[2]*gamma[3]*gamma[4];
   gamma[6] = mat::Identity(4,4);
   gamma[11] = gamma[1]*gamma[5];
