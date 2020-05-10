@@ -11,9 +11,10 @@ Operator adjoint(const Operator o)
 
 	///Include the p/m coefficient due to (gamma_4 GAMMA^{\dagger} gamma_4)
 	auto a_mesons = a.terms[0].mesons;
+  auto pm_coef = 1;
 	for(const auto &m : a_mesons)
 	{	
-	  pm_coef *= -1;
+//	  pm_coef *= -1;
 		auto g = m.gamma;
 		if( (g=="5") || (g=="1") || (g=="2") || (g=="3") || (g=="1 5") || (g=="2 5") || (g=="3 5") )
 			pm_coef*=-1;

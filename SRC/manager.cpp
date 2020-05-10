@@ -177,11 +177,16 @@ void Manager::wick_contractions()
 	{
 	//	cout << "wick contraction for c_ij = " << i << " " << j << endl;
 		corrs[i*ops.size() +j].wick_contract();
+		auto wick_logger = spdlog::get("wick");
+		std::string diag_names;
+		for(const auto &d: corrs[i*ops.size() + j].diags)
+			diag_names+=d.name()+"\n";	
+		wick_logger->info("Resulting diags for c_{}{} = \n{}", i, j, diag_names);
 	//	cout << endl;
 	}
 
 
-	for(size_t i=0; i<ops.size(); ++i)
+/*	for(size_t i=0; i<ops.size(); ++i)
 	for(size_t j=0; j<ops.size(); ++j)
 	{
 		auto wick_logger = spdlog::get("wick");
@@ -190,6 +195,7 @@ void Manager::wick_contractions()
 			diag_names+=d.name()+"\n";	
 		wick_logger->info("Resulting diags for c_{}{} = \n{}", i, j, diag_names);
 	}
+*/
 }
 
 
