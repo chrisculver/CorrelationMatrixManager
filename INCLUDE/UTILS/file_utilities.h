@@ -12,5 +12,10 @@ std::map<std::string, std::vector<std::vector<std::complex<double>>> > parse_dia
 
 std::string cpp_prefix();
 std::string cpp_postfix();
+std::string gpu_code_cpp_prefix(long int batches);
+std::string gpu_code_cpp_postfix();
+std::string gpu_code_cuda_prefix();
+std::string gpu_code_cuda_postfix();
+
 
 #endif

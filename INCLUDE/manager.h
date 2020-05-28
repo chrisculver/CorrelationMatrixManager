@@ -46,7 +46,7 @@ struct Trace_Code_Data
 struct Manager
 {
 	///Bool to choose how much output there is only the main logger or all loggers
-  bool verbose_logging;	
+  bool verbose_logging;
 	///Holds the lattice data
 	Lattice lat;
 	///Holds the filenames
@@ -70,13 +70,14 @@ struct Manager
 	///This function performs the wick contractions for all correlation matrix elements
 	void wick_contractions();
 
-	///This function loads the diagrams from a file(s). 
+	///This function loads the diagrams from a file(s).
 	void load_numerical_results();
-	
+
 	std::vector<Trace> traces_to_compute();
 	std::vector<Trace> traces_to_compute(const std::vector<std::string> computed_names);
 
 	void cpu_code_output(std::ofstream &file, std::vector<Trace> need_to_compute);
+	void gpu_code_output(std::ofstream &cppfile, std::ofstream &gpufile, std::vector<Trace> need_to_compute);
 	void diagram_names_output(std::ofstream &file, std::vector<Trace> need_to_compute);
 	void runtime_input_for_cpu(std::ofstream &file, std::vector<Trace> need_to_compute);
 

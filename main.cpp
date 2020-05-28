@@ -25,9 +25,9 @@ int main(int argc, char **argv)
       cout << "CRITICAL ERROR: Can't open input file\n";
       cout << "								 Exiting...\n";
     }
-    
+
     if(ex == 'c')
-    {  
+    {
       cout << "CRITICAL ERROR: CFG missing from input\n";
       cout << "								 Cannot create log files\n";
       cout << "								 Exiting...\n";
@@ -52,15 +52,22 @@ int main(int argc, char **argv)
 	{
 		///TODO: Currently all diagrams in one file, goes through the list
 		//sequentially, load's alot of data into memory, and searches a large map.
-		///Could create some clever system to look in different files corresponding 
+		///Could create some clever system to look in different files corresponding
 		///to the length of the diagram and load all those traces, then next size, etc.
 		run.load_numerical_results();
 	}
 	catch(vector<Trace> need_to_compute)
 	{
 		ofstream cpu_code("define_diagrams.cpp");
-		run.cpu_code_output(cpu_code, need_to_compute);	
+		run.cpu_code_output(cpu_code, need_to_compute);
 		cpu_code.close();
+
+		ofstream gpu_compute_cppfile("define_diagrams_gpu.cpp");
+		ofstream gpu_compute_cudafile("gpu_kernel.cpp");
+		run.gpu_code_output(gpu_compute_cppfile, gpu_compute_cudafile, need_to_compute);
+		gpu_compute_cppfile.close();
+		gpu_compute_cudafile.close();
+
 
 		ofstream diag_names("diagram_names.txt");
 		run.diagram_names_output(diag_names, need_to_compute);
