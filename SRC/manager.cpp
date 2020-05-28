@@ -593,15 +593,15 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 	cppfile << "int dim = qf[0].rows();\n";
 
 	cppfile << "std::complex<double> *res = (std::complex<double> *)malloc(sizeof(std::complex<double>)*"
-	        << ")*dim*dim*" << to_string(num_res_mats) << ");\n";
+	        << "dim*dim*" << to_string(num_res_mats) << ");\n";
 
 	cppfile << "vector<std::complex<double>*> qfs, qbs, qtis, qtfs;\n";
 	cppfile << "for(size_t i=0; i<qf.size(); ++i)\n"
 					<< "{\n"
-					<< "qfs.push_back(new std::cmplex<double>[dim*dim]);\n"
-					<< "qbs.push_back(new std::cmplex<double>[dim*dim]);\n"
-					<< "qtis.push_back(new std::cmplex<double>[dim*dim]);\n"
-					<< "qtfs.push_back(new std::cmplex<double>[dim*dim]);\n"
+					<< "qfs.push_back(new std::complex<double>[dim*dim]);\n"
+					<< "qbs.push_back(new std::complex<double>[dim*dim]);\n"
+					<< "qtis.push_back(new std::complex<double>[dim*dim]);\n"
+					<< "qtfs.push_back(new std::complex<double>[dim*dim]);\n"
 					<< "}\n";
 
 	cppfile << "for(size_t i=0; i<qf.size(); ++i)\n"
