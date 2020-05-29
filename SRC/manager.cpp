@@ -563,8 +563,8 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 				         << q0[0] << " + " << q0[1]
 								 << "*dim*dim, mat_size, cudaMemcpyDeviceToDevice);" << endl;
 				gpufile << "cudaMemcpy(d_twoB + " << to_string(d) << "*dim*dim, d_"
- 				         << q1[0] << " + " << q1[1]
- 								 << "*dim*dim, mat_size, cudaMemcpyDeviceToDevice);" << endl;
+ 				         << q1[0] << " + (" << q1[1]
+ 								 << ")*dim*dim, mat_size, cudaMemcpyDeviceToDevice);" << endl;
 			}
 
 			gpufile << "cublasZgemmStridedBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, "
