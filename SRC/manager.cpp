@@ -575,32 +575,62 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 			gpufile << "cudaMemcpy(res, d_twoC, batch[" << l << "]*mat_size, cudaMemcpyDeviceToHost);\n";
 			gpufile << "cudaFree(d_twoA);\n";
 			gpufile << "cudaFree(d_twoB);\n";
+			gpufile << "cudaFree(d_twoC);\n";
 
 		}
 
 		///We now need to look for them in the above computation.
 		///First implementation assumes infinite memory in GPU.
 		///Only substituting using d_twoC
-		if(l>1)
+		if(l>0)
 		{
+			cppfile << "batch_size[" << l << "]" << trs.size() << ";" << endl;
+
+			gpufile << "cuDoubleComplex ";
+			char arraylabel = 'A';
+			for(size_t i=0; i<=l; ++i)
+			{
+				if(i!=l)
+					gpufile << "*d_" << l << arraylabel << ", ";
+				else
+					gpufile << "*d_" << l << arraylabel << ";\n";
+				arraylabel++;
+			}
+			arraylabel = 'A';
+			for(size_t i=0; i<=l; ++i)
+			{
+				gpufile << "cudaMalloc((void **) &d_" << l << arraylabel << ", batch["
+								<< l << "]*mat_size);\n";
+				arraylabel++;
+			}
+
 			for(size_t d=0; d<trs.size(); ++d)
 			{
-				vector<string> computation = trs[d].compute_name;
-				for(size_t i=0; i<traces_by_size[1].size(); ++i)///search for d_twoC's
-				{
-					auto lookup = traces_by_size[1][i].compute_name;
-					if( (computation[0] == lookup[0]) && (computation[1]==lookup[1]) )
-					{
-						gpufile << "found first 2 elements of l=" << l << " d=" << d << endl;
-					}
-					else
-					{
-						gpufile << "didnt find for l=" << l << "d=" << d << endl;
-					}
+				auto s = trs[d].compute_name;
+				vector<vector<string>> q;
+				for(const auto e : s)
+					q.push_back( split(e,'[') );
 
+				for(auto &e : q)
+					e[1].erase( remove(e[1].begin(), e[1].end(), ']'), e[1].end() );
+
+				arraylabel='A';
+				for(size_t i=0; i<=l; ++i)
+				{
+					gpufile << "cudaMemcpy(d_" << l << arraylabel << " + " << to_string(d)
+								  << "*dim*dim, d_" << q[i][0] << " + (" << q[i][1]
+									<< ")*dim*dim, mat_size, cudaMemcpyDeviceToDevice);" << endl;
+					arraylabel++;
 				}
 			}
+			arraylabel='A';
+			for(size_t i=0; i<l; ++i)
+			{
+
+			}
+
 		}
+
 
 	}
 
@@ -646,7 +676,6 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 	cppfile << "qtfs.clear();\n";
 
 
-	gpufile << "cudaFree(d_twoC);\n";
 	gpufile << gpu_code_cuda_postfix();
 
 	///Now finish off the cpu code
