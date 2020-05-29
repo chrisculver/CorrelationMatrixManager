@@ -575,7 +575,6 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 			gpufile << "cudaMemcpy(res, d_twoC, batch[" << l << "]*mat_size, cudaMemcpyDeviceToHost);\n";
 			gpufile << "cudaFree(d_twoA);\n";
 			gpufile << "cudaFree(d_twoB);\n";
-			gpufile << "cudaFree(d_twoC);\n";
 
 		}
 
@@ -584,13 +583,23 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 		///Only substituting using d_twoC
 		if(l>1)
 		{
-				int num_mat_mults = (l/2);
-				if(l%2==1)
-					num_mat_mults++;
-				for(size_t d=0; d<trs.size(); ++d)
+			for(size_t d=0; d<trs.size(); ++d)
+			{
+				vector<string> computation = trs[d].compute_name;
+				for(size_t i=0; i<traces_by_size[1].size(); ++i)///search for d_twoC's
 				{
-					
+					auto lookup = traces_by_size[1][i].compute_name;
+					if( (computation[0] == lookup[0]) && (computation[1]==lookup[1]) )
+					{
+						gpufile << "found first 2 elements of l=" << l << " d=" << d << endl;
+					}
+					else
+					{
+						gpufile << "didnt find for l=" << l << "d=" << d << endl;
+					}
+
 				}
+			}
 		}
 
 	}
@@ -637,7 +646,7 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 	cppfile << "qtfs.clear();\n";
 
 
-
+	gpufile << "cudaFree(d_twoC);\n";
 	gpufile << gpu_code_cuda_postfix();
 
 	///Now finish off the cpu code
