@@ -545,7 +545,7 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 		{
 			cppfile << "batch_size[" << l << "] = " << trs.size() << ";" << endl;
 
-			gpufile << "cuDoubleComplex *d_twoA, *dtwoB, *d_twoC;\n";
+			gpufile << "cuDoubleComplex *d_twoA, *d_twoB, *d_twoC;\n";
 			gpufile << "cudaMalloc((void **) &d_twoA, batch[" << l << "]*mat_size);\n";
 			gpufile << "cudaMalloc((void **) &d_twoB, batch[" << l << "]*mat_size);\n";
 			gpufile << "cudaMalloc((void **) &d_twoC, batch[" << l << "]*mat_size);\n";
@@ -637,8 +637,17 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 					<< "{\n";
 	for(size_t d=0; d<need_to_compute.size(); ++d)
 	{
-		int d_idx = 0;
-		cppfile << "diag[" << d << "][dt][t] = res[" << d_idx << "*dim*dim + i*dim + i];\n";
+		int d_idx = res_idx[d];
+		int l_idx = 0;
+		///Also need to adjust it to the right batch location.
+		for(size_t l=0; l<traces_by_size.size(); ++l)
+      if(need_to_compute[d].qls.size()==(l+1))
+				l_idx = l;
+
+		for(int l=1; l<l_idx; ++l)
+			d_idx += traces_by_size[l].size();
+
+		cppfile << "diag[" << d << "][dt][t] += res[" << d_idx << "*dim*dim + i*dim + i];\n";
 	}
 	cppfile << "}\n";
 

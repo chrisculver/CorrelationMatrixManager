@@ -101,7 +101,7 @@ string gpu_code_cuda_prefix()
                                           +"std::vector<std::complex<double>*> qti,"
                                           +"std::vector<std::complex<double>*> qtf,"
                                           +"int dim,"
-                                          +"std::vector<int> batch)\n {\n";
+                                          +"std::vector<long int> batch)\n {\n";
   text = text +      "cudaError_t cudaStat;\n"
 	      +     "cublasStatus_t stat;\n"
 	      +     "cublasHandle_t handle;\n"
