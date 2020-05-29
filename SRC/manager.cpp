@@ -560,8 +560,8 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 				q0[1].erase ( remove(q0[1].begin(), q0[1].end(), ']'), q0[1].end() );
 				q1[1].erase ( remove(q1[1].begin(), q1[1].end(), ']'), q1[1].end() );
 				gpufile << "cudaMemcpy(d_twoA + " << to_string(d) << "*dim*dim, d_"
-				         << q0[0] << " + " << q0[1]
-								 << "*dim*dim, mat_size, cudaMemcpyDeviceToDevice);" << endl;
+				         << q0[0] << " + (" << q0[1]
+								 << ")*dim*dim, mat_size, cudaMemcpyDeviceToDevice);" << endl;
 				gpufile << "cudaMemcpy(d_twoB + " << to_string(d) << "*dim*dim, d_"
  				         << q1[0] << " + (" << q1[1]
  								 << ")*dim*dim, mat_size, cudaMemcpyDeviceToDevice);" << endl;
@@ -580,9 +580,17 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 		}
 
 		///We now need to look for them in the above computation.
+		///First implementation assumes infinite memory in GPU.
+		///Only substituting using d_twoC
 		if(l>1)
 		{
-
+				int num_mat_mults = (l/2);
+				if(l%2==1)
+					num_mat_mults++;
+				for(size_t d=0; d<trs.size(); ++d)
+				{
+					
+				}
 		}
 
 	}
