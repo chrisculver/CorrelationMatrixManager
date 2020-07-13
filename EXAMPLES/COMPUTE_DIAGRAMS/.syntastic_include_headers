@@ -1,4 +1,3 @@
-
 -I ./SRC/
--I /Users/chris/Code/Libraries/gwu-qcd/include/
--I /Users/chris/Code/Libraries/eigen3/
+-I /CCAS/home/chrisculver/Libraries/eigen/
+-I /CCAS/home/chrisculver/Libraries/gwu-qcd-gcc485gpu/

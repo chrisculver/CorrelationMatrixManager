@@ -73,7 +73,7 @@ string cpp_postfix()
   return "\n}";
 }
 
-string gpu_code_cpp_prefix(long int batches)
+string gpu_code_cpp_prefix()
 {
   string text;
   text += "#include \"define_diagrams.h\"\n";
@@ -84,7 +84,24 @@ string gpu_code_cpp_prefix(long int batches)
   text += "void define_diagrams(vector< vector< vector < complex<double> > > > &diag, const vector<mat> qf, const vector<mat> qb,";
   text += "const vector<mat> qti, const vector<mat> qtf, int t, int dt)\n";
   text += "{\n";
-  text += "std::vector<long int> batch_size(" + to_string(batches) + ");";
+  text += "int dim = qf[0].rows();\n";
+  text += "vector<std::complex<double>*> qfs, qbs, qtis, qtfs;\n";
+	text += "for(size_t i=0; i<qf.size(); ++i)\n";
+	text += "{\n";
+	text += "qfs.push_back(new std::complex<double>[dim*dim]);\n";
+	text += "qbs.push_back(new std::complex<double>[dim*dim]);\n";
+	text += "qtis.push_back(new std::complex<double>[dim*dim]);\n";
+	text += "qtfs.push_back(new std::complex<double>[dim*dim]);\n";
+	text += "}\n";
+
+	text += "for(size_t i=0; i<qf.size(); ++i)\n";
+	text += "{\n";
+	text += "Eigen::Map<mat>(qfs[i],dim,dim) = qf[i];\n";
+	text += "Eigen::Map<mat>(qbs[i],dim,dim) = qb[i];\n";
+	text += "Eigen::Map<mat>(qtis[i],dim,dim) = qti[i];\n";
+	text += "Eigen::Map<mat>(qtfs[i],dim,dim) = qtf[i];\n";
+	text += "}\n";
+  text += "long int mat_size = dim*dim*sizeof(std::complex<double>);\n";
   return text;
 }
 
@@ -94,14 +111,20 @@ string gpu_code_cuda_prefix()
   text += "#include \"gpu_kernel.h\"\n";
   text += "#include <cuda_runtime.h>\n";
   text += "#include <cublas_v2.h>\n\n";
+  return text;
+}
 
-  text = text + "void cublas_batch_multiply_all(std::complex<double> *res,"
+string gpu_code_function_prefix(std::string l, std::string s)
+{
+  string text;
+
+  text = text + "void cublas_batch_multiply_" + l + "_" + s + "(std::complex<double> *res,"
                                           +"std::vector<std::complex<double>*> qf,"
                                           +"std::vector<std::complex<double>*> qb,"
                                           +"std::vector<std::complex<double>*> qti,"
                                           +"std::vector<std::complex<double>*> qtf,"
-                                          +"int dim,"
-                                          +"std::vector<long int> batch)\n {\n";
+                                          +"long int dim"
+                                          +")\n {\n";
   text = text +      "cudaError_t cudaStat;\n"
 	      +     "cublasStatus_t stat;\n"
 	      +     "cublasHandle_t handle;\n"
@@ -131,13 +154,14 @@ string gpu_code_cuda_prefix()
               + "cudaMemcpy(d_qti + i*dim*dim, qti[i], mat_size, cudaMemcpyHostToDevice);\n"
               + "cudaMemcpy(d_qtf + i*dim*dim, qtf[i], mat_size, cudaMemcpyHostToDevice);\n"
               + "}\n";
+  text += "cuDoubleComplex *d_A, *d_B, *d_C;\n";
 
 
 
   return text;
 }
 
-string gpu_code_cuda_postfix()
+string gpu_code_function_postfix()
 {
   string text;
 
@@ -157,7 +181,6 @@ string gpu_code_cuda_postfix()
 string gpu_code_cpp_postfix()
 {
   string text;
-  text += "free(res);\n";
   text += "}";
   return text;
 }

@@ -3,13 +3,72 @@
 
 #include <complex>
 #include <vector>
-//#include "matrix.h"
 
-//qcd::matrix cublas_multiply_two(qcd::matrix qcdA, qcd::matrix qcdB, int dim);
-//qcd::matrix cublas_multiply_four(qcd::matrix qcdA, qcd::matrix qcdB, qcd::matrix qcdC, qcd::matrix qcdD, int dim);
-
-void cublas_batch_multiply_two(std::complex<double> *A, std::complex<double> *B, int batch, int dim);
-void cublas_batch_multiply_four(std::complex<double> *A, std::complex<double> *B, std::complex<double> *C, std::complex<double> *D, int batch, int dim);
-void cublas_batch_multiply_six(std::complex<double> *A, std::complex<double> *B,	std::complex<double> *C, std::complex<double> *D, std::complex<double> *E, std::complex<double> *F, int batch, int dim);
+void cublas_batch_multiply_1_0(std::complex<double> *res, std::vector<std::complex<double>*> qf, 
+																													std::vector<std::complex<double>*> qb,
+																													std::vector<std::complex<double>*> qti,
+																													std::vector<std::complex<double>*> qtf,
+																													long int dim
+																													);
+void cublas_batch_multiply_2_0(std::complex<double> *res, std::vector<std::complex<double>*> qf, 
+																													std::vector<std::complex<double>*> qb,
+																													std::vector<std::complex<double>*> qti,
+																													std::vector<std::complex<double>*> qtf,
+																													long int dim
+																													);
+void cublas_batch_multiply_2_1(std::complex<double> *res, std::vector<std::complex<double>*> qf, 
+																													std::vector<std::complex<double>*> qb,
+																													std::vector<std::complex<double>*> qti,
+																													std::vector<std::complex<double>*> qtf,
+																													long int dim
+																													);
+void cublas_batch_multiply_3_0(std::complex<double> *res, std::vector<std::complex<double>*> qf, 
+																													std::vector<std::complex<double>*> qb,
+																													std::vector<std::complex<double>*> qti,
+																													std::vector<std::complex<double>*> qtf,
+																													long int dim
+																													);
+void cublas_batch_multiply_3_1(std::complex<double> *res, std::vector<std::complex<double>*> qf, 
+																													std::vector<std::complex<double>*> qb,
+																													std::vector<std::complex<double>*> qti,
+																													std::vector<std::complex<double>*> qtf,
+																													long int dim
+																													);
+void cublas_batch_multiply_4_0(std::complex<double> *res, std::vector<std::complex<double>*> qf, 
+																													std::vector<std::complex<double>*> qb,
+																													std::vector<std::complex<double>*> qti,
+																													std::vector<std::complex<double>*> qtf,
+																													long int dim
+																													);
+void cublas_batch_multiply_4_1(std::complex<double> *res, std::vector<std::complex<double>*> qf, 
+																													std::vector<std::complex<double>*> qb,
+																													std::vector<std::complex<double>*> qti,
+																													std::vector<std::complex<double>*> qtf,
+																													long int dim
+																													);
+void cublas_batch_multiply_5_0(std::complex<double> *res, std::vector<std::complex<double>*> qf, 
+																													std::vector<std::complex<double>*> qb,
+																													std::vector<std::complex<double>*> qti,
+																													std::vector<std::complex<double>*> qtf,
+																													long int dim
+																													);
+void cublas_batch_multiply_5_1(std::complex<double> *res, std::vector<std::complex<double>*> qf, 
+																													std::vector<std::complex<double>*> qb,
+																													std::vector<std::complex<double>*> qti,
+																													std::vector<std::complex<double>*> qtf,
+																													long int dim
+																													);
+void cublas_batch_multiply_6_0(std::complex<double> *res, std::vector<std::complex<double>*> qf, 
+																													std::vector<std::complex<double>*> qb,
+																													std::vector<std::complex<double>*> qti,
+																													std::vector<std::complex<double>*> qtf,
+																													long int dim
+																													);
+void cublas_batch_multiply_6_1(std::complex<double> *res, std::vector<std::complex<double>*> qf, 
+																													std::vector<std::complex<double>*> qb,
+																													std::vector<std::complex<double>*> qti,
+																													std::vector<std::complex<double>*> qtf,
+																													long int dim
+																													);
 
 #endif

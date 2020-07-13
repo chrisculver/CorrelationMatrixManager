@@ -50,9 +50,11 @@ void Manager::load_input(string input_filename)
   if( name_value.count("cfg")==0 )
     throw 'c';
 
-
   verbose_logging = stoi(name_value["verbose_logging"]);
   name_value.erase("verbose_logging");
+
+	gpu_memory = stoi(name_value["gpu_memory"]);
+	name_value.erase("gpu_memory");
 
   ///Construct lattice data container
 	lat = Lattice( stoi(name_value["nx"]),
@@ -72,10 +74,12 @@ void Manager::load_input(string input_filename)
 	main_logger->info("Loaded lattice data\nnx={} | ny={} | nz={} | nt={} | cfg={}\n",
 										 lat.nx, lat.ny, lat.nz, lat.nt, cfg_to_string(lat.cfg));
 
-	files = FileNames(name_value["operator_filename"], "diags_"+to_string(lat.nx)+to_string(lat.ny)
-				+to_string(lat.nz)+to_string(lat.nt)+"_"+cfg_to_string(lat.cfg)+".dat");
+	//files = FileNames(name_value["operator_filename"], "diags_"+to_string(lat.nx)+to_string(lat.ny)
+	//			+to_string(lat.nz)+to_string(lat.nt)+"_"+cfg_to_string(lat.cfg)+".dat");
+	files = FileNames(name_value["operator_filename"],
+					name_value["diagram_prefix"]+cfg_to_string(lat.cfg)+".dat");
 	name_value.erase("operator_filename");
-	name_value.erase("diagram_filename");
+	name_value.erase("diagram_prefix");
 
 	main_logger->info("Loaded filenames\noperator_filename = {} | diagram_filename = {}\n",
 									  files.operator_filename, files.diagram_filename );
@@ -263,6 +267,8 @@ vector<Trace> Manager::traces_to_compute(const vector<string> computed_names)
 		for(size_t i=0; i<r.qls.size(); ++i)
 		{
 			if( find(res.begin(), res.end(), r) != res.end() )
+				found=true;
+			if( find(computed_names.begin(), computed_names.end(), r.name()) != computed_names.end() )
 				found=true;
 			rotate( r.qls.begin(), r.qls.begin()+1, r.qls.end() );
 		}
@@ -467,6 +473,266 @@ void Manager::shutdown()
 
 
 
+
+void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace> need_to_compute)
+{
+
+	vector<string> unique_mom, unique_disp, unique_gamma;
+	for(const auto& t : need_to_compute)
+		for(const auto& q : t.qls)
+		{
+			if(find(unique_mom.begin(), unique_mom.end(), q.mom) == unique_mom.end())
+				unique_mom.push_back(q.mom);
+			if(find(unique_disp.begin(), unique_disp.end(), q.displacement) == unique_disp.end())
+				unique_disp.push_back(q.displacement);
+			if(find(unique_gamma.begin(), unique_gamma.end(), q.gamma) == unique_gamma.end())
+				unique_gamma.push_back(q.gamma);
+		}
+
+	int max_size=0;
+	for(auto t : need_to_compute)
+		if(t.qls.size() > max_size)
+			max_size=t.qls.size();
+	///collect diagrams of certain lengths 1,2,3,4,5,6,etc
+	vector<int> idx_track(max_size,0);///tracks idx for each length
+	vector<int> res_idx;///for the result to pull the correct trace
+	vector<vector<Trace_Code_Data>> traces_by_size(max_size);
+	vector<vector<int>> orig_idx(max_size);
+	//for(auto t : tr)
+	for(size_t i=0; i<need_to_compute.size(); ++i)
+	{
+		auto t_size = need_to_compute[i].qls.size()-1;
+		traces_by_size[t_size].push_back(
+			Trace_Code_Data(need_to_compute[i].compute_name(unique_mom, unique_disp, unique_gamma), idx_track[t_size])
+																		);
+
+		orig_idx[t_size].push_back(i);
+		res_idx.push_back(idx_track[t_size]);
+		idx_track[t_size]++;
+	}
+
+	cppfile << gpu_code_cpp_prefix();
+	gpufile << gpu_code_cuda_prefix();
+
+	long int num_res_mats = need_to_compute.size();
+
+
+
+	for(size_t l=0; l<traces_by_size.size(); ++l)
+	{
+
+		if(l==0)
+			cppfile << "std::complex<double> *res = (std::complex<double> *)malloc(((long int)sizeof(std::complex<double>))*"
+							<< "((long int)dim*dim)*((long int)" << traces_by_size[l].size() << "));\n";
+		//else
+
+		///Just take the trace of a quark line.
+		if(l==0)
+		{
+			auto trs = traces_by_size[l];
+			for(size_t d=0; d<trs.size(); ++d)
+			{
+				auto split_name = split(trs[d].compute_name[0], '[');
+				cppfile << "memcpy(res + " << d << "*dim*dim, " << split_name[0]
+				        << "s[" << split_name[1] << ", mat_size);";
+
+
+				cppfile << endl;
+			}
+		}
+
+		else
+		{
+			long int mat_size = 4*4*100*100*2*8; ///NS*NS*NDIM*NDIM*complex_double
+			long int ql_mem = unique_mom.size()*unique_disp.size()*unique_gamma.size()*4*mat_size;
+			long int num_sub_batches = traces_by_size[l].size()*3*mat_size/(gpu_memory*((long int)1000*1000) - ql_mem - ((long int)100*1000*1000) );
+			cout << "num_sub_batches = " << num_sub_batches+1 << endl;
+			vector<vector<Trace_Code_Data>> sub_batches(num_sub_batches+1);
+			long int mem_used = ql_mem;
+			int curr_list = 0;
+
+			for(size_t d=0; d<traces_by_size[l].size(); ++d)
+			{
+				mem_used += ((long int)3)*mat_size;
+				if( (gpu_memory*((long int)1000*1000)-mem_used) < ((long int)1000*1000*100) )
+				{
+			 		curr_list++;
+					mem_used = ql_mem;
+				}
+				sub_batches[curr_list].push_back( traces_by_size[l][d] );
+			}
+
+
+
+			for(size_t s=0; s<sub_batches.size(); ++s)
+			{
+				if(l!=0)
+					gpufile << gpu_code_function_prefix(to_string(l),to_string(s));
+				auto trs = sub_batches[s];
+				if(l!=0)
+				{
+			cppfile << "res = (std::complex<double> *)malloc(((long int)sizeof(std::complex<double>))*"
+							<< "((long int)dim*dim)*((long int)" << trs.size() << "));\n";
+
+				}
+				//num_res_mats += trs.size();
+
+				///just need to take the trace - do this on cpu.
+				///First implementation assumes infinite memory in GPU.
+				//cppfile << "batch_size[" << l << "] = " << trs.size() << ";" << endl;
+
+				char arraylabel('A'), res_label('C');
+				for(size_t i=0; i<3; ++i)
+				{
+					gpufile << "cudaMalloc((void **) &d_" << arraylabel << ", ((long int)" << sub_batches[s].size() << ")*mat_size);\n";
+					arraylabel++;
+				}
+
+				vector<string> memcpy_qls(l+1, "");///hold the cudaMemcpy's so they can be placed appropriately
+
+				for(size_t d=0; d<trs.size(); ++d)
+				{
+					auto s = trs[d].compute_name;
+					vector<vector<string>> q;
+					for(const auto e : s)
+						q.push_back( split(e,'[') );
+
+					for(auto &e : q)
+						e[1].erase( remove(e[1].begin(), e[1].end(), ']'), e[1].end() );
+
+					for(size_t i=0; i<=l; ++i)
+					{
+						arraylabel='A';
+						if(i==1)
+							arraylabel = 'B'; //only for the startup do I need to load into another array
+
+							memcpy_qls[i] = memcpy_qls[i] + "cudaMemcpy(d_" + arraylabel + " + " + to_string(d)
+								  	+ "*dim*dim, d_" + q[i][0] + " + (" + q[i][1]
+										+ ")*dim*dim, mat_size, cudaMemcpyDeviceToDevice);\n";
+					}
+				}
+
+				gpufile << memcpy_qls[0] << memcpy_qls[1];
+				arraylabel='A';
+				///First multiply uses the first two matrices in order.
+				gpufile << "cublasZgemmStridedBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, "
+								<< "dim, dim, dim, "
+								<< "_alpha, d_" << arraylabel << ", dim, dim*dim, ";
+				arraylabel++;
+				gpufile << "d_" << arraylabel << ", dim, dim*dim, "
+								<< "_beta, d_" << res_label << ", dim, dim*dim, "
+								<< trs.size() << ");\n";
+			  arraylabel='A';
+				//The rest require the previous result.
+				for(size_t i=1; i<l; ++i)
+				{
+					gpufile << memcpy_qls[i+1];
+					gpufile << "cublasZgemmStridedBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, "
+									<< "dim, dim, dim, "
+									<< "_alpha, d_" << res_label << ", dim, dim*dim, ";
+
+				  if(res_label == 'C')
+						res_label = 'B';
+				  else
+					  res_label = 'C';
+
+						gpufile << "d_" << arraylabel << ", dim, dim*dim, "
+									<< "_beta, d_" << res_label << ", dim, dim*dim, "
+									<< trs.size() << ");\n";
+				}
+
+				///offsets the memcpy from Device to Host
+				long int res_offset = 0;
+				for(size_t i=0; i<l; ++i)
+					res_offset += traces_by_size[i].size();
+				for(size_t i=0; i<s; ++i)
+					res_offset += sub_batches[i].size();
+				//if( (l!=1) && (s!=0))
+				//	res_offset++;
+
+				gpufile << "cudaMemcpy(res, d_" << res_label << ", " << trs.size() << "*mat_size, cudaMemcpyDeviceToHost);\n";
+
+				arraylabel = 'A';
+				for(size_t i=0; i<3; ++i)
+				{
+					gpufile << "cudaFree(d_" << arraylabel << ");\n";
+					arraylabel++;
+				}
+			if(l!=0)
+				cppfile << "cublas_batch_multiply_" << l << "_" << s << "(res, qfs, qbs, qtis, qtfs, dim);\n";
+
+			///Now take the trace and free up memory for rest of calculation.
+			cppfile << "for(int i=0; i<dim; ++i)\n"
+							<< "{\n";
+			for(size_t c=0; c<trs.size(); ++c)
+			{
+				int sub_offset = 0;
+				for(int o=s-1; o>=0; o--)
+					sub_offset += sub_batches[o].size();
+				cppfile << "diag[" << orig_idx[l][c+sub_offset] << "][dt][t] += res[((long int)" << c << ")*dim*dim + i*dim + i];\n";
+			}
+			cppfile << "}\n";
+
+			cppfile << "free(res);\n";
+			if(l!=0)
+				gpufile << gpu_code_function_postfix();
+
+			}///end s loop
+
+
+		}///end l>0 loop
+
+	if(l==0)
+	{
+			///Now take the trace and free up memory for rest of calculation.
+			cppfile << "for(int i=0; i<dim; ++i)\n"
+							<< "{\n";
+			for(size_t c=0; c<traces_by_size[l].size(); ++c)
+			{
+				cppfile << "diag[" << orig_idx[l][c] << "][dt][t] += res[((long int)" << c << ")*dim*dim + i*dim + i];\n";
+			}
+			cppfile << "}\n";
+
+			cppfile << "free(res);\n";
+
+	}
+
+	}///end l loop
+
+
+
+
+
+	cppfile << "for(auto e : qfs)\n"
+					<< "	delete e;\n";
+	cppfile << "for(auto e : qbs)\n"
+					<< "	delete e;\n";
+	cppfile << "for(auto e : qtis)\n"
+					<< "	delete e;\n";
+	cppfile << "for(auto e : qtfs)\n"
+					<< "	delete e;\n";
+
+	cppfile << "qfs.clear();\n";
+	cppfile << "qbs.clear();\n";
+	cppfile << "qtis.clear();\n";
+	cppfile << "qtfs.clear();\n";
+
+
+
+
+
+	cppfile << gpu_code_cpp_postfix();
+
+}
+
+
+
+
+
+
+
+
+
 /// The above CPU code generation produces computations like d6[0] = res3*res3
 /// AND 																										 d6[1] = ql*res4*ql
 /// Which would make for some complicated GPU code generation logic with the
@@ -477,6 +743,8 @@ void Manager::shutdown()
 
 ///
 
+
+/*
 void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace> need_to_compute)
 {
 	gpufile << gpu_code_cuda_prefix();
@@ -512,136 +780,13 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 		idx_track[t_size]++;
 	}
 
-	cppfile << gpu_code_cpp_prefix(traces_by_size.size());
+	cppfile << gpu_code_cpp_prefix();
 
-	long int num_res_mats = 0;
-
-	for(size_t l=0; l<traces_by_size.size(); ++l)
-	{
-		///just need to take the trace - do this on cpu.
-		auto trs = traces_by_size[l];
-		num_res_mats += trs.size();
-
-		if(l==0)
-		{
-			for(size_t d=0; d<trs.size(); ++d)
-			{
-				cppfile << "res" << l+1 << "[" << d << "]=";
-				//for(auto q : trs[d].compute_name)
-				for(size_t i=0; i<trs[d].compute_name.size(); ++i)
-				{
-					cppfile << trs[d].compute_name[i];
-					if(i!=trs[d].compute_name.size()-1)
-						cppfile << "*";
-					else
-						cppfile << ";";
-				}
-				cppfile << endl;
-			}
-		}
-
-		///do all the multiplications on gpu and save.
-		if(l==1)
-		{
-			cppfile << "batch_size[" << l << "] = " << trs.size() << ";" << endl;
-
-			gpufile << "cuDoubleComplex *d_twoA, *d_twoB, *d_twoC;\n";
-			gpufile << "cudaMalloc((void **) &d_twoA, batch[" << l << "]*mat_size);\n";
-			gpufile << "cudaMalloc((void **) &d_twoB, batch[" << l << "]*mat_size);\n";
-			gpufile << "cudaMalloc((void **) &d_twoC, batch[" << l << "]*mat_size);\n";
-
-			for(size_t d=0; d<trs.size(); ++d)
-			{
-
-				auto s = trs[d].compute_name;
-				auto q0 = split(s[0],'[');
-				auto q1 = split(s[1],'[');
-
-				q0[1].erase ( remove(q0[1].begin(), q0[1].end(), ']'), q0[1].end() );
-				q1[1].erase ( remove(q1[1].begin(), q1[1].end(), ']'), q1[1].end() );
-				gpufile << "cudaMemcpy(d_twoA + " << to_string(d) << "*dim*dim, d_"
-				         << q0[0] << " + (" << q0[1]
-								 << ")*dim*dim, mat_size, cudaMemcpyDeviceToDevice);" << endl;
-				gpufile << "cudaMemcpy(d_twoB + " << to_string(d) << "*dim*dim, d_"
- 				         << q1[0] << " + (" << q1[1]
- 								 << ")*dim*dim, mat_size, cudaMemcpyDeviceToDevice);" << endl;
-			}
-
-			gpufile << "cublasZgemmStridedBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, "
-			        << "dim, dim, dim, "
-							<< "_alpha, d_twoA, dim, dim*dim, d_twoB, dim, dim*dim, "
-							<< "_beta, d_twoC, dim, dim*dim, batch[" << l << "]);\n";
-
-			gpufile << "cudaMemcpy(res, d_twoC, batch[" << l << "]*mat_size, cudaMemcpyDeviceToHost);\n";
-			gpufile << "cudaFree(d_twoA);\n";
-			gpufile << "cudaFree(d_twoB);\n";
-			gpufile << "cudaFree(d_twoC);\n";
-
-		}
-
-		///We now need to look for them in the above computation.
-		///First implementation assumes infinite memory in GPU.
-		///Only substituting using d_twoC
-		if(l>0)
-		{
-			cppfile << "batch_size[" << l << "]" << trs.size() << ";" << endl;
-
-			gpufile << "cuDoubleComplex ";
-			char arraylabel = 'A';
-			for(size_t i=0; i<=l; ++i)
-			{
-				if(i!=l)
-					gpufile << "*d_" << l << arraylabel << ", ";
-				else
-					gpufile << "*d_" << l << arraylabel << ";\n";
-				arraylabel++;
-			}
-			arraylabel = 'A';
-			for(size_t i=0; i<=l; ++i)
-			{
-				gpufile << "cudaMalloc((void **) &d_" << l << arraylabel << ", batch["
-								<< l << "]*mat_size);\n";
-				arraylabel++;
-			}
-
-			for(size_t d=0; d<trs.size(); ++d)
-			{
-				auto s = trs[d].compute_name;
-				vector<vector<string>> q;
-				for(const auto e : s)
-					q.push_back( split(e,'[') );
-
-				for(auto &e : q)
-					e[1].erase( remove(e[1].begin(), e[1].end(), ']'), e[1].end() );
-
-				arraylabel='A';
-				for(size_t i=0; i<=l; ++i)
-				{
-					gpufile << "cudaMemcpy(d_" << l << arraylabel << " + " << to_string(d)
-								  << "*dim*dim, d_" << q[i][0] << " + (" << q[i][1]
-									<< ")*dim*dim, mat_size, cudaMemcpyDeviceToDevice);" << endl;
-					arraylabel++;
-				}
-			}
-			arraylabel='A';
-			for(size_t i=0; i<l; ++i)
-			{
-
-			}
-
-		}
-
-
-	}
-
-
-
-
+	long int num_res_mats = need_to_compute.size();
 	cppfile << "int dim = qf[0].rows();\n";
 
-	cppfile << "std::complex<double> *res = (std::complex<double> *)malloc(sizeof(std::complex<double>)*"
-	        << "dim*dim*" << to_string(num_res_mats) << ");\n";
-
+	cppfile << "std::complex<double> *res = (std::complex<double> *)malloc(((long int)sizeof(std::complex<double>))*"
+	        << "((long int)dim*dim)*((long int)" << to_string(num_res_mats) << "));\n";
 	cppfile << "vector<std::complex<double>*> qfs, qbs, qtis, qtfs;\n";
 	cppfile << "for(size_t i=0; i<qf.size(); ++i)\n"
 					<< "{\n"
@@ -659,7 +804,145 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 					<< "Eigen::Map<mat>(qtfs[i],dim,dim) = qtf[i];\n"
 					<< "}\n";
 
-	cppfile << "cublas_batch_multiply_all(res, qfs, qbs, qtis, qtfs, dim, batch_size);\n";
+
+	gpufile << "cuDoubleComplex *d_A, *d_B, *d_C;\n";
+
+	for(size_t l=0; l<traces_by_size.size(); ++l)
+	{
+		///Just take the trace of a quark line.
+		if(l==0)
+		{
+			auto trs = traces_by_size[l];
+			cppfile << "long int mat_size = dim*dim*sizeof(std::complex<double>);\n";
+			for(size_t d=0; d<trs.size(); ++d)
+			{
+				auto split_name = split(trs[d].compute_name[0], '[');
+				cppfile << "memcpy(res + " << d << "*dim*dim, " << split_name[0]
+				        << "s[" << split_name[1] << ", mat_size);";
+
+
+				cppfile << endl;
+			}
+		}
+		else
+		{
+			long int mat_size = 4*4*100*100*2*8; ///NS*NS*NDIM*NDIM*complex_double
+			long int ql_mem = unique_mom.size()*unique_disp.size()*unique_gamma.size()*4*mat_size;
+			long int num_sub_batches = traces_by_size[l].size()*3*mat_size/(gpu_memory*((long int)1000*1000) - ql_mem - ((long int)100*1000*1000) );
+			cout << "num_sub_batches = " << num_sub_batches+1 << endl;
+			vector<vector<Trace_Code_Data>> sub_batches(num_sub_batches+1);
+			long int mem_used = ql_mem;
+			int curr_list = 0;
+
+			for(size_t d=0; d<traces_by_size[l].size(); ++d)
+			{
+				mem_used += ((long int)3)*mat_size;
+				if( (gpu_memory*((long int)1000*1000)-mem_used) < ((long int)1000*1000*100) )
+				{
+			 		curr_list++;
+					mem_used = ql_mem;
+				}
+				sub_batches[curr_list].push_back( traces_by_size[l][d] );
+			}
+
+
+
+			for(size_t s=0; s<sub_batches.size(); ++s)
+			{
+				auto trs = sub_batches[s];
+				//num_res_mats += trs.size();
+
+				///just need to take the trace - do this on cpu.
+				///First implementation assumes infinite memory in GPU.
+				//cppfile << "batch_size[" << l << "] = " << trs.size() << ";" << endl;
+
+				char arraylabel('A'), res_label('C');
+				for(size_t i=0; i<3; ++i)
+				{
+					gpufile << "cudaMalloc((void **) &d_" << arraylabel << ", ((long int)" << sub_batches[s].size() << ")*mat_size);\n";
+					arraylabel++;
+				}
+
+				vector<string> memcpy_qls(l+1, "");///hold the cudaMemcpy's so they can be placed appropriately
+
+				for(size_t d=0; d<trs.size(); ++d)
+				{
+					auto s = trs[d].compute_name;
+					vector<vector<string>> q;
+					for(const auto e : s)
+						q.push_back( split(e,'[') );
+
+					for(auto &e : q)
+						e[1].erase( remove(e[1].begin(), e[1].end(), ']'), e[1].end() );
+
+					for(size_t i=0; i<=l; ++i)
+					{
+						arraylabel='A';
+						if(i==1)
+							arraylabel = 'B'; //only for the startup do I need to load into another array
+
+							memcpy_qls[i] = memcpy_qls[i] + "cudaMemcpy(d_" + arraylabel + " + " + to_string(d)
+								  	+ "*dim*dim, d_" + q[i][0] + " + (" + q[i][1]
+										+ ")*dim*dim, mat_size, cudaMemcpyDeviceToDevice);\n";
+					}
+				}
+
+				gpufile << memcpy_qls[0] << memcpy_qls[1];
+				arraylabel='A';
+				///First multiply uses the first two matrices in order.
+				gpufile << "cublasZgemmStridedBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, "
+								<< "dim, dim, dim, "
+								<< "_alpha, d_" << arraylabel << ", dim, dim*dim, ";
+				arraylabel++;
+				gpufile << "d_" << arraylabel << ", dim, dim*dim, "
+								<< "_beta, d_" << res_label << ", dim, dim*dim, "
+								<< trs.size() << ");\n";
+			  arraylabel='A';
+				//The rest require the previous result.
+				for(size_t i=1; i<l; ++i)
+				{
+					gpufile << memcpy_qls[i+1];
+					gpufile << "cublasZgemmStridedBatched(handle, CUBLAS_OP_N, CUBLAS_OP_N, "
+									<< "dim, dim, dim, "
+									<< "_alpha, d_" << res_label << ", dim, dim*dim, ";
+
+				  if(res_label == 'C')
+						res_label = 'B';
+				  else
+					  res_label = 'C';
+
+						gpufile << "d_" << arraylabel << ", dim, dim*dim, "
+									<< "_beta, d_" << res_label << ", dim, dim*dim, "
+									<< trs.size() << ");\n";
+				}
+
+				///offsets the memcpy from Device to Host
+				long int res_offset = 0;
+				for(size_t i=0; i<l; ++i)
+					res_offset += traces_by_size[i].size();
+				for(size_t i=0; i<s; ++i)
+					res_offset += sub_batches[i].size();
+				//if( (l!=1) && (s!=0))
+				//	res_offset++;
+
+				gpufile << "cudaMemcpy(res + ((long int)" << res_offset << ")*dim*dim, d_" << res_label << ", " << trs.size() << "*mat_size, cudaMemcpyDeviceToHost);\n";
+
+				arraylabel = 'A';
+				for(size_t i=0; i<3; ++i)
+				{
+					gpufile << "cudaFree(d_" << arraylabel << ");\n";
+					arraylabel++;
+				}
+
+			}///end if (l>0)
+
+		}///end s loop
+
+	}///end l loop
+
+
+
+	cppfile << "cublas_batch_multiply_all(res, qfs, qbs, qtis, qtfs, dim);\n";
 
 	cppfile << "for(auto e : qfs)\n"
 					<< "	delete e;\n";
@@ -690,13 +973,14 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
       if(need_to_compute[d].qls.size()==(l+1))
 				l_idx = l;
 
-		for(int l=1; l<l_idx; ++l)
+		for(int l=0; l<l_idx; ++l)
 			d_idx += traces_by_size[l].size();
 
-		cppfile << "diag[" << d << "][dt][t] += res[" << d_idx << "*dim*dim + i*dim + i];\n";
+		cppfile << "diag[" << d << "][dt][t] += res[((long int)" << d_idx << ")*dim*dim + i*dim + i];\n";
 	}
 	cppfile << "}\n";
 
 	cppfile << gpu_code_cpp_postfix();
 
 }
+*/

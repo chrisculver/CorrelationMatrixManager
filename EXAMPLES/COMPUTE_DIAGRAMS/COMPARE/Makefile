@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -I./INCLUDE/
 
-UTILITIES = string_utilities.cpp
+UTILITIES = string_utilities.cpp file_utilities.cpp diagrams.cpp
 
 SOURCE = $(UTILITIES) 
 OBJECTS = $(SOURCE:.cpp=.o) 

@@ -163,15 +163,10 @@ int main(int argc, char** argv)
   gamma[4].resize(4,4); gamma[4] << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, -1;
 #endif
   // anti-milc basis
-  //gamma[1].resize(4,4); gamma[1] << 0, 0, 0, -I, 0, 0, -I, 0, 0, I, 0, 0, I, 0, 0, 0;
-  //gamma[2].resize(4,4); gamma[2] << 0, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, 1, 0, 0, 0;
-  //gamma[3].resize(4,4); gamma[3] << 0, 0, -I, 0, 0, 0, 0, I, I, 0, 0, 0, 0, -I, 0, 0;
-  //gamma[4].resize(4,4); gamma[4] << 0, 0, -1, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, 0;
-  // euclidean gammas
-  gamma[1].resize(4,4); gamma[1] << 0, 0, 0, I, 0, 0, I, 0, 0, -I, 0, 0, -I, 0, 0, 0;
+  gamma[1].resize(4,4); gamma[1] << 0, 0, 0, -I, 0, 0, -I, 0, 0, I, 0, 0, I, 0, 0, 0;
   gamma[2].resize(4,4); gamma[2] << 0, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, 1, 0, 0, 0;
-  gamma[3].resize(4,4); gamma[3] << 0, 0, I, 0, 0, 0, 0, -I, -I, 0, 0, 0, 0, I, 0, 0;
-  gamma[4].resize(4,4); gamma[4] << 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0;  
+  gamma[3].resize(4,4); gamma[3] << 0, 0, -I, 0, 0, 0, 0, I, I, 0, 0, 0, 0, -I, 0, 0;
+  gamma[4].resize(4,4); gamma[4] << 0, 0, -1, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, 0;
   gamma[5] = gamma[1]*gamma[2]*gamma[3]*gamma[4];
   gamma[6] = mat::Identity(4,4);
   gamma[11] = gamma[1]*gamma[5];
@@ -193,24 +188,17 @@ int main(int argc, char** argv)
   {
     step& s = steps[i];
     if(s.gamma==5)
-      printf("5 ");
+      printf("\\Gamma_5 ");
     else if(s.gamma==6)
-      printf("6 ");
+      printf("\\identity ");
     else if(s.gamma==1)
-      printf("1 ");
-		else if(s.gamma==11)
-			printf("1 5 ");
-		printf("\\delta_{ii} ");
+      printf("\\Gamma_1 ");
     printf("%d %d %d ", s.p[0], s.p[1], s.p[2]);
     if(s.t==0)
-      printf("i ");
+      printf("t");
     else if(s.t==1)
-      printf("f ");
-		if(steps[(i+1)%steps.size()].t==0)
-			printf("i ");
-		else
-			printf("f ");
-    if(i<steps.size()-1) printf("| "); else printf("]\n");
+      printf("t_f");
+    if(i<steps.size()-1) printf(" | "); else printf(" ]\n");
   }
   for(int dt=0; dt<m.nt; ++dt)
   {
