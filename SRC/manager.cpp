@@ -176,17 +176,47 @@ void Manager::wick_contractions()
 {
 //	for(auto &c: corrs)
 //		c.wick_contract();
+	bool load = false;
+	string wick_file = "logs/" + files.operator_filename + ".wick";
+	if(file_exists(wick_file))
+		load=true;
+
 	for(size_t i=0; i<ops.size(); ++i)
 	for(size_t j=0; j<ops.size(); ++j)
 	{
 	//	cout << "wick contraction for c_ij = " << i << " " << j << endl;
-		corrs[i*ops.size() +j].wick_contract();
-		auto wick_logger = spdlog::get("wick");
-		std::string diag_names;
-		for(const auto &d: corrs[i*ops.size() + j].diags)
-			diag_names+=d.name()+"\n";
-		wick_logger->info("Resulting diags for c_{}{} = \n{}", i, j, diag_names);
+		if(load==false)
+		{
+			corrs[i*ops.size() +j].wick_contract();
+			auto wick_logger = spdlog::get("wick");
+			std::string diag_names;
+			for(const auto &d: corrs[i*ops.size() + j].diags)
+			{
+				diag_names+=d.name();
+				///compare addresses because its a range based for
+				if(&d != &(corrs[i*ops.size()+j].diags).back())
+					diag_names+="+";
+
+			}
+			wick_logger->info("Resulting diags for c_{}{}={}", i, j, diag_names);
+		}
+		else
+		{
+			corrs[i*ops.size() + j].load_wick_contractions(wick_file, i, j);
+		}
 	//	cout << endl;
+	}
+
+	for(size_t i=0; i<ops.size(); ++i)
+	for(size_t j=0; j<ops.size(); ++j)
+	{
+		std::cout << "diagrams for i=" << i << " j=" << j << std::endl;
+		auto tmp = corrs[i*ops.size()+j];
+		for(auto d : tmp.diags)
+		{
+			std::cout << d.name() << std::endl;
+		}
+		std::cout << std::endl;
 	}
 
 

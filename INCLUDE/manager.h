@@ -51,6 +51,8 @@ struct Manager
 	Lattice lat;
 	///Holds the filenames
 	FileNames files;
+	///Holds the amount of memory on GPU
+	long int gpu_memory;
 
 	std::vector<Operator> ops;
 

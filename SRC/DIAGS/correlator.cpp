@@ -1,7 +1,9 @@
 #include "DIAGS/correlator.h"
 #include "UTILS/wick.h"
+#include "UTILS/string_utilities.h"
 
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 
 using namespace std;
@@ -15,7 +17,7 @@ void Correlator::wick_contract()
 	{
 		new_diags=wick_contract_elems(c_e, a_e);
 		///First consolidate the diagrams returned amongst themselves.
-		
+
 		///push some diags into diags
 		///not duplicating elements
 		for(const auto &d: new_diags)
@@ -33,12 +35,12 @@ void Correlator::wick_contract()
 						{
 							found=true;
 							diags[e].coef+=d.coef;
-						}			
+						}
 					}
 				}
 			}
 			if(!found)
-				diags.push_back(d);	
+				diags.push_back(d);
 
 		}
 	}
@@ -49,6 +51,49 @@ void Correlator::wick_contract()
 
 }
 
+void Correlator::load_wick_contractions(const std::string filename, const int i, const int j)
+{
+	ifstream in_file(filename);
+
+	std::string line;
+	while(getline(in_file, line))
+	{
+		vector<string> log_split = split(line,'R');
+		vector<string> equals_split = split(log_split[1],'=');
+		if(equals_split[0]==("esulting diags for c_"+to_string(i)+to_string(j)))
+		{
+			vector<string> diag_text = split(equals_split[1],'+');
+			for(auto &term : diag_text)
+			{
+				Diagram d;
+				vector<string> trs_text = split(term,'[');
+				d.coef = stoi(trs_text[0]);
+				for(size_t i=1; i<trs_text.size(); ++i)
+				{
+					Trace t;
+					vector<string> qls_text = split(trs_text[i],'|');
+					for(size_t j=0; j<qls_text.size(); ++j)
+					{
+						QuarkLine q;
+
+						vector<string> disp_split = split(qls_text[j],'\\');
+						q.gamma=disp_split[0].substr(1,disp_split[0].size()-2);
+						vector<string> rhs = split(disp_split[1],' ');
+						q.displacement = "\\" + rhs[0];
+						q.mom=rhs[1]+" "+rhs[2]+" "+rhs[3];
+						q.ti=rhs[4][0];
+						q.tf=rhs[5][0];
+						t.qls.push_back(q);
+					}
+					d.traces.push_back(t);
+				}
+				diags.push_back(d);
+			}
+
+		}
+	}
+	in_file.close();
+}
 
 void Correlator::load_numerical_results(Saved_Traces computed)
 {
@@ -75,8 +120,6 @@ void Correlator::load_numerical_results(Saved_Traces computed)
 						break;
 					}
 				}
-        
-       
 
 				if(!found)
           throw 'm';
@@ -106,5 +149,5 @@ void Correlator::compute_time_average_correlators(int NT)
     }///end t
     corr_t[dt] = time_avg/(double(NT));
   }///end dt
-	
+
 }

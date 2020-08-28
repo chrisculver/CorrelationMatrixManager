@@ -30,29 +30,29 @@ std::string Diagram::name() const
 
 vector<vector<Trace>> Diagram::all_cyclic_related_diagrams() const
 {
-	///This finds ALL diagrams that are related by cyclic permutations. 
+	///This finds ALL diagrams that are related by cyclic permutations.
 	/// [ A B ] [ C D ]
 	/// First we make all permutations of the traces, i.e.
 	/// { [ A B ] [ C D ] , [ C D ] [ B A ]}
-	/// For each of these lists find 
+	/// For each of these lists find
 
 	///the vector of traces the algorithm starts at
 	auto start = traces;
 	vector<vector<vector<Trace>>> tmp(start.size()+1);
 
-	heaps_algorithm(tmp[0], start, start.size());	
+	heaps_algorithm(tmp[0], start, start.size());
 
 
 	for(size_t i=0; i<start.size(); ++i)
 	{
-	
+
 		for(size_t lst=0; lst<tmp[i].size(); ++lst)
 		for(size_t j=0; j<tmp[i][lst][i].qls.size(); ++j)
 		{
 			rotate(tmp[i][lst][i].qls.begin(), tmp[i][lst][i].qls.begin()+1, tmp[i][lst][i].qls.end());
 			tmp[i+1].push_back(tmp[i][lst]);
 		}
-	
+
 	}
 
 	return tmp[start.size()];

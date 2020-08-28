@@ -13,14 +13,14 @@ Current functionality includes
 - Read in a list of operators constructed out of mesons.
 - Compute the wick contractions for all correlation matrix elements.
 - Check on disk for numerical values of diagrams.
-  
+
   - If none exist, output C++ code to compute diagrams using GWU-QCD library.
 
 - Return the correlation functions averaged over all times.
 
 
 Follow the read me on `github <https://github.com/chrisculver/CorrelationMatrixManager>`_ for
-installation instructions.  Once the program is successfully installed head to :ref:`getting_started` 
+installation instructions.  Once the program is successfully installed head to :ref:`getting_started`
 for a quick-start guide to the code.  To see how the input is formatted head to :ref:`input`.
 
 ..  toctree::
@@ -29,13 +29,6 @@ for a quick-start guide to the code.  To see how the input is formatted head to 
 
     USER_GUIDE/getting_started.rst
     USER_GUIDE/input.rst
-
-..  toctree::
-    :caption: Physics
-    :maxdepth: 2
-
-    PHYSICS/intro.rst
-    PHYSICS/operators.rst
 
 ..  toctree::
     :caption: API
