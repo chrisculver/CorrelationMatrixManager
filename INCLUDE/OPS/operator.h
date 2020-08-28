@@ -4,14 +4,15 @@
 #include "OPS/elemental_op.h"
 
 #include <vector>
-#include <string> 
+#include <string>
 
 
 struct Operator
 {
 	public:
 		std::vector<ElementalOp> terms;
-		
+
+		Operator(){};
 		Operator(std::vector<ElementalOp> t): terms(t){};
 
 		template<typename OStream>
@@ -20,7 +21,7 @@ struct Operator
 			for(size_t i=0; i<o.terms.size(); ++i)
 			{
 				os << o.terms[i];
-				if(i!=(o.terms.size()-1))	
+				if(i!=(o.terms.size()-1))
 					os << " + ";
 			}
 			return os;

@@ -18,6 +18,7 @@ class Correlator
 
 		std::vector<std::complex<double>> corr_t;
 
+		Correlator(){};
 		Correlator(Operator n_a, Operator c_a):c(c_a), a(n_a){};
 
 		void wick_contract();

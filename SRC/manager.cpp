@@ -162,10 +162,17 @@ void Manager::load_operators()
 	for(size_t i=0; i<ops.size(); ++i)
 		main_logger->info("Adjoint operator {} = {}", i, adjoint(ops[i]));
 
-	for(const auto &c : ops)
-		for(const auto &a : ops)
-			corrs.push_back( Correlator(adjoint(a), c) );
-
+//	for(const auto &c : ops)
+//		for(const auto &a : ops)
+//			corrs.push_back( Correlator(adjoint(a), c) );
+	for(size_t i=0; i<ops.size(); ++i)
+	for(size_t j=0; j<ops.size(); ++j)
+	{
+		if(j<=i)
+			corrs.push_back( Correlator(adjoint(ops[i]), ops[j]) );
+		else
+			corrs.push_back( Correlator() );
+	}
 
 	op_logger->flush();
 	main_logger->flush();
