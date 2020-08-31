@@ -266,7 +266,12 @@ int main(int argc, char **argv)
       unique_ts.push_back(stoi(times[i]));
   }
 
-
+  std::ofstream corr_file;
+  std::string cfg_str;
+  std::stringstream ss;
+  ss << std::setfill('0') << std::setw(3) << to_string(cfg);
+  cfg_str  = ss.str();
+  corr_file.open("diags_"+to_string(nx)+to_string(ny)+to_string(nz)+to_string(nt)+"_"+cfg_str+".dat");
 
   ///Compute the momentum matrices TODO-Displacements: For all mom and displacements
   ///How to select which ones are in operators?
@@ -396,12 +401,7 @@ int main(int argc, char **argv)
   }
   name_file.close();
 
-	std::ofstream corr_file;
-	std::string cfg_str;
-	std::stringstream ss;
-	ss << std::setfill('0') << std::setw(3) << to_string(cfg);
-	cfg_str  = ss.str();
-	corr_file.open("diags_"+to_string(nx)+to_string(ny)+to_string(nz)+to_string(nt)+"_"+cfg_str+".dat");
+	
 	for(int i=0; i<NDIAGS; ++i){
 		corr_file << diag_names[i] << "\n";
 		for(int i_dt=0; i_dt<unique_dts.size(); ++i_dt){
