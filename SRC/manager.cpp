@@ -214,19 +214,22 @@ void Manager::wick_contractions()
 		}
 	//	cout << endl;
 	}
-
+/*
 	for(size_t i=0; i<ops.size(); ++i)
 	for(size_t j=0; j<ops.size(); ++j)
 	{
-		std::cout << "diagrams for i=" << i << " j=" << j << std::endl;
-		auto tmp = corrs[i*ops.size()+j];
-		for(auto d : tmp.diags)
+		if(i<=j)
 		{
-			std::cout << d.name() << std::endl;
+			std::cout << "diagrams for i=" << i << " j=" << j << std::endl;
+			auto tmp = corrs[i*ops.size()+j];
+			for(auto d : tmp.diags)
+			{
+				std::cout << d.name() << std::endl;
+			}
+			std::cout << std::endl;
 		}
-		std::cout << std::endl;
 	}
-
+*/
 
 /*	for(size_t i=0; i<ops.size(); ++i)
 	for(size_t j=0; j<ops.size(); ++j)
