@@ -142,7 +142,8 @@ int main(int argc, char **argv)
 	int this_node = get_node_rank();
   options opt;
 
-	std::vector<textline> mom_str, disp_str, gamma_str, dt_list, t_list;
+	std::vector<textline> mom_str, disp_str, gamma_str;
+  std::string dt_list, t_list;
   std::string mname, lname, latname="auto";
 	int nx, ny, nz, nt;
 	bool checkeig = false;
@@ -229,16 +230,40 @@ int main(int argc, char **argv)
     unique_displacements[0]=std::vector<int>{0};
   }
 
-  std::vector<double> unique_dts(dt_list.size()), unique_ts(t_list.size());
-  for(size_t i=0; i<dt_list.size(); ++i)
+  std::vector<int> unique_dts, unique_ts;
+  std::cout << dt_list << "    " << t_list << std::endl;
+  if(dt_list=="ALL")
   {
-    unique_dts[i]=stoi(dt_list[i]);
-    std::cout << unique_dts[i] << std::endl;
+    for(size_t i=0; i<nt; ++i)
+      unique_dts.push_back(i);
   }
-  for(size_t i=0; i<t_list.size(); ++i)
+  else if(dt_list=="HALF")/// up to and including half temporal extent of lattice
   {
-    unique_ts[i]=stoi(t_list[i]);
-    std::cout << unique_ts[i] << std::endl;
+    for(size_t i=0; i<=nt/2; ++i)
+      unique_dts.push_back(i);
+  }
+  else
+  {
+    std::vector<std::string> times = split(dt_list,',');
+    for(size_t i=0; i<times.size(); ++i)
+      unique_dts.push_back(stoi(times[i]));
+  }
+
+  if(t_list=="ALL")
+  {
+    for(size_t i=0; i<nt; ++i)
+      unique_ts.push_back(i);
+  }
+  else if(t_list=="HALF")/// exactly half
+  {
+    for(size_t i=0; i<nt/2; ++i)
+      unique_ts.push_back(i);
+  }
+  else
+  {
+    std::vector<std::string> times = split(t_list,',');
+    for(size_t i=0; i<times.size(); ++i)
+      unique_ts.push_back(stoi(times[i]));
   }
 
   ///Compute the momentum matrices TODO-Displacements: For all mom and displacements

@@ -296,8 +296,6 @@ vector<Trace> Manager::traces_to_compute()
 
 vector<Trace> Manager::traces_to_compute(const vector<string> computed_names)
 {
-	///TODO : make this use computed_names, I don't want to do this yet until
-	/// I have some safe way to merge/combine/handle diagram files better.
 	vector<Trace> res;
 	for(auto &c: corrs)
 	for(auto &d: c.diags)

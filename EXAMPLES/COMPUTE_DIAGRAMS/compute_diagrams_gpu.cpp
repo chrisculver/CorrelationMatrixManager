@@ -219,17 +219,6 @@ int main(int argc, char **argv)
 			unique_gammas[i]*=gamma[stoi(ints[j])];
 		}
 	}
-
-  std::vector<double> unique_dts(dt_list.size()), unique_ts(t_list.size());
-  for(size_t i=0; i<dt_list.size(); ++i)
-  {
-    unique_dts[i]=stoi(dt_list[i]);
-  }
-  for(size_t i=0; i<t_list.size(); ++i)
-  {
-    unique_ts[i]=stoi(t_list[i]);
-
-  }
   ///Take the gamma_names list and make the actual matrices
   //for(size_t gi=0; gi<unique_gammas[g].size(); ++gi)
   //  unique_gammas[gi]*=gamma[gi];
@@ -239,6 +228,44 @@ int main(int argc, char **argv)
   {
     unique_displacements[0]=std::vector<int>{0};
   }
+
+  std::vector<int> unique_dts, unique_ts;
+  std::cout << dt_list << "    " << t_list << std::endl;
+  if(dt_list=="ALL")
+  {
+    for(size_t i=0; i<nt; ++i)
+      unique_dts.push_back(i);
+  }
+  else if(dt_list=="HALF")/// up to and including half temporal extent of lattice
+  {
+    for(size_t i=0; i<=nt/2; ++i)
+      unique_dts.push_back(i);
+  }
+  else
+  {
+    std::vector<std::string> times = split(dt_list,',');
+    for(size_t i=0; i<times.size(); ++i)
+      unique_dts.push_back(stoi(times[i]));
+  }
+
+  if(t_list=="ALL")
+  {
+    for(size_t i=0; i<nt; ++i)
+      unique_ts.push_back(i);
+  }
+  else if(t_list=="HALF")/// exactly half
+  {
+    for(size_t i=0; i<nt/2; ++i)
+      unique_ts.push_back(i);
+  }
+  else
+  {
+    std::vector<std::string> times = split(t_list,',');
+    for(size_t i=0; i<times.size(); ++i)
+      unique_ts.push_back(stoi(times[i]));
+  }
+
+
 
   ///Compute the momentum matrices TODO-Displacements: For all mom and displacements
   ///How to select which ones are in operators?
