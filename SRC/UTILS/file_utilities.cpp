@@ -22,6 +22,8 @@ Saved_Traces parse_diagram_file(std::string filename, int NT)
   while(getline(input, line))
   {
 		vector<vector<complex<double>>> tmp_val(NT);
+    /// for dt in dts
+    /// resize( length(ts) )
     for(int t=0; t<NT; ++t)
       tmp_val[t].resize(NT);
 
@@ -29,6 +31,8 @@ Saved_Traces parse_diagram_file(std::string filename, int NT)
       all_names.push_back(line);
     else
     {
+
+
       auto idx=0;
       auto vals=split(line, ' ');
       for(int i=0; i<NT; ++i)

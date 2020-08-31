@@ -142,7 +142,7 @@ int main(int argc, char **argv)
 	int this_node = get_node_rank();
   options opt;
 
-	std::vector<textline> mom_str, disp_str, gamma_str;
+	std::vector<textline> mom_str, disp_str, gamma_str, dt_list, t_list;
   std::string mname, lname, latname="auto";
 	int nx, ny, nz, nt;
 	bool checkeig = false;
@@ -161,6 +161,8 @@ int main(int argc, char **argv)
 	opt.add("unique_mom", mom_str);
   opt.add("unique_gammas", gamma_str);
   opt.add("unique_displacement", disp_str);
+  opt.add("dt_list", dt_list);
+  opt.add("t_list", t_list);
   opt.read_options(argc,argv);
 
 	lname = latname + ".laplacean.eigensystem";
@@ -196,7 +198,7 @@ int main(int argc, char **argv)
   gamma[2].resize(4,4); gamma[2] << 0, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, 1, 0, 0, 0;
   gamma[3].resize(4,4); gamma[3] << 0, 0, -I, 0, 0, 0, 0, I, I, 0, 0, 0, 0, -I, 0, 0;
   gamma[4].resize(4,4); gamma[4] << 0, 0, -1, 0, 0, 0, 0, -1, -1, 0, 0, 0, 0, -1, 0, 0;
-	gamma[1].resize(4,4); 
+	gamma[1].resize(4,4);
   gamma[5] = gamma[1]*gamma[2]*gamma[3]*gamma[4];
   gamma[6] = mat::Identity(4,4);
 
@@ -217,6 +219,17 @@ int main(int argc, char **argv)
 			unique_gammas[i]*=gamma[stoi(ints[j])];
 		}
 	}
+
+  std::vector<double> unique_dts(dt_list.size()), unique_ts(t_list.size());
+  for(size_t i=0; i<dt_list.size(); ++i)
+  {
+    unique_dts[i]=stoi(dt_list[i]);
+  }
+  for(size_t i=0; i<t_list.size(); ++i)
+  {
+    unique_ts[i]=stoi(t_list[i]);
+
+  }
   ///Take the gamma_names list and make the actual matrices
   //for(size_t gi=0; gi<unique_gammas[g].size(); ++gi)
   //  unique_gammas[gi]*=gamma[gi];
@@ -252,23 +265,25 @@ int main(int argc, char **argv)
   ///Container to hold all the diagrams
 	std::vector < std::vector< std::vector< std::complex<double> > > > diag(NDIAGS);
 	for(size_t i=0; i<diag.size(); ++i)
-		diag[i].resize(nt);
+		diag[i].resize(unique_dts.size());
 	for(size_t i=0; i<diag.size(); ++i)
 		for(size_t j=0; j<diag[i].size(); ++j)
-			diag[i][j].resize(nt);
+			diag[i][j].resize(unique_ts.size());
 	for(size_t i=0; i<diag.size(); ++i)
 		for(size_t j=0; j<diag[i].size(); ++j)
 			for(size_t k=0; k<diag[i][j].size(); ++k)
 				diag[i][j][k]=0.;
 
-  for(int dt=0; dt<nt; ++dt)
+  for(int i_dt=0; i_dt<unique_dts.size(); ++i_dt)
   {
+    int dt = unique_dts[i_dt];
     timer one_dt;
     one_dt.start("Computing qlines and diags for one dt");
 
     ///  Save q lines as 400 by 400 matrices.  for each momentum p, gamma, disp.
-    for(int t=0; t<nt; ++t)
+    for(int i_t=0; i_t<unique_ts.size(); ++i_t)
     {
+      int t=unique_ts[i_t];
 			timer tm_ql;
 			tm_ql.start("computing qlines");
 
@@ -335,7 +350,7 @@ int main(int argc, char **argv)
 
       timer tm_diags;
       tm_diags.start("computing diagrams");
-			define_diagrams(diag, ql_forward, ql_backward, ql_init, ql_fin, t, dt);
+			define_diagrams(diag, ql_forward, ql_backward, ql_init, ql_fin, i_t, i_dt);
       tm_diags.stop();
 		}/// end of t loop
 
@@ -361,11 +376,11 @@ int main(int argc, char **argv)
 	corr_file.open("diags_"+to_string(nx)+to_string(ny)+to_string(nz)+to_string(nt)+"_"+cfg_str+".dat");
 	for(int i=0; i<NDIAGS; ++i){
 		corr_file << diag_names[i] << "\n";
-		for(int dt=0; dt<nt; ++dt){
-			for(int t=0; t<nt; ++t){
-				corr_file << std::scientific << std::setprecision(10) << diag[i][dt][t].real() << " " << diag[i][dt][t].imag() << " ";
+		for(int i_dt=0; i_dt<unique_dts.size(); ++i_dt){
+			for(int i_t=0; i_t<unique_ts.size(); ++i_t){
+        corr_file << std::fixed << std::setprecision(0) << unique_dts[i_dt] << " " << unique_ts[i_t] << " ";
+				corr_file << std::scientific << std::setprecision(10) << diag[i][i_dt][i_t].real() << " " << diag[i][i_dt][i_t].imag() << "\n";
 			}
-			corr_file << "\n";
 		}
 	}
   corr_file.close();

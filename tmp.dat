@@ -1,0 +1,19 @@
+/// write code to convert existing diagrams into new format.
+
+/// write something to read this into a map.  (used in CCM and next exec)
+[ diag 1 ]
+dt t re im
+4  1 4  3
+4  4 8  2
+4  3 4  3
+5  6 8  2 
+[ diag 2 ]
+
+
+
+///write to existing diag file
+takes new diagrams/dts.  and adds to the existing file safely.
+
+
+
+{  diag 1 -> { list of (dt t val) }, diag 2 -> { list of (dt t val) } }

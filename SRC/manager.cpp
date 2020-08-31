@@ -209,7 +209,8 @@ void Manager::wick_contractions()
 		}
 		else
 		{
-			corrs[i*ops.size() + j].load_wick_contractions(wick_file, i, j);
+			if(j<=i)
+				corrs[i*ops.size() + j].load_wick_contractions(wick_file, i, j);
 		}
 	//	cout << endl;
 	}
