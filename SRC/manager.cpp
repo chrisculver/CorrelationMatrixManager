@@ -205,7 +205,7 @@ void Manager::wick_contractions()
 					diag_names+="+";
 
 			}
-			wick_logger->info("Resulting diags for c_{}{}={}", i, j, diag_names);
+			wick_logger->info("Resulting diags for c_{}.{}={}", i, j, diag_names);
 		}
 		else
 		{

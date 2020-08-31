@@ -60,7 +60,7 @@ void Correlator::load_wick_contractions(const std::string filename, const int i,
 	{
 		vector<string> log_split = split(line,'R');
 		vector<string> equals_split = split(log_split[1],'=');
-		if(equals_split[0]==("esulting diags for c_"+to_string(i)+to_string(j)))
+		if(equals_split[0]==("esulting diags for c_"+to_string(i)+"."+to_string(j)))
 		{
 			vector<string> diag_text = split(equals_split[1],'+');
 			for(auto &term : diag_text)
@@ -91,6 +91,7 @@ void Correlator::load_wick_contractions(const std::string filename, const int i,
 			}
 
 		}
+		line="";
 	}
 	in_file.close();
 }
