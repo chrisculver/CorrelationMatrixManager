@@ -142,7 +142,8 @@ int main(int argc, char **argv)
 	int this_node = get_node_rank();
   options opt;
 
-	std::vector<textline> mom_str, disp_str, gamma_str, dt_list, t_list;
+	std::vector<textline> mom_str, disp_str, gamma_str;
+  std::string dt_list, t_list;
   std::string mname, lname, latname="auto";
 	int nx, ny, nz, nt;
 	bool checkeig = false;
