@@ -68,6 +68,46 @@ void Manager::load_input(string input_filename)
 	name_value.erase("nt");
 	name_value.erase("cfg");
 
+
+	///dt and t to compute for
+
+	if(name_value["dts"]=="ALL")
+	{
+		for(size_t i=0; i<lat.nt; ++i)
+			dts.push_back(i);
+	}
+	else if(name_value["dts"]=="HALF")
+	{
+		for(size_t i=0; i<=lat.nt/2; ++i)
+			dts.push_back(i);
+	}
+	else
+	{
+		vector<string> dts_string = split(name_value["dts"],',');
+		for(auto &s : dts_string)
+			dts.push_back( stoi(s) );
+	}
+
+	if(name_value["ts"]=="ALL")
+	{
+		for(size_t i=0; i<lat.nt; ++i)
+			ts.push_back(i);
+	}
+	else if(name_value["ts"]=="HALF")
+	{
+		for(size_t i=0; i<lat.nt/2; ++i)
+			ts.push_back(i);
+	}
+	else
+	{
+		vector<string> ts_string = split(name_value["ts"],',');
+		for(auto &s : ts_string)
+			ts.push_back( stoi(s) );
+	}
+
+	name_value.erase("dts");
+	name_value.erase("ts");
+
   ///Set up logging system
   create_logs();
 	auto main_logger = spdlog::get("main");
@@ -484,6 +524,23 @@ void Manager::runtime_input_for_cpu(ofstream &file, vector<Trace> need_to_comput
   file << "unique_displacement:length " << unique_disp.size() << endl;
   for(size_t i=0; i<unique_disp.size(); ++i)
     file << "unique_displacement:" << i << " " << unique_disp[i] << endl;
+
+	file << "dt_list ";
+	for(size_t i=0; i<dts.size(); ++i)
+	{
+		file << dts[i];
+		if(i != dts.size()-1 )
+		 file << ",";
+	}
+	file << endl;
+	file << "t_list ";
+	for(size_t i=0; i<ts.size(); ++i)
+	{
+		file << ts[i];
+		if(i != ts.size()-1 )
+		 file << ",";
+	}
+	file << endl;
 }
 
 
