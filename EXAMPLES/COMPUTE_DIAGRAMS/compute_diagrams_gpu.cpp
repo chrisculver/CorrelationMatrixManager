@@ -143,7 +143,7 @@ int main(int argc, char **argv)
   options opt;
 
 	std::vector<textline> mom_str, disp_str, gamma_str;
-  std::string dt_list, t_list;
+  std::string dt_list, t_list,out_prefix;
   std::string mname, lname, latname="auto";
 	int nx, ny, nz, nt;
 	bool checkeig = false;
@@ -164,6 +164,7 @@ int main(int argc, char **argv)
   opt.add("unique_displacement", disp_str);
   opt.add("dt_list", dt_list);
   opt.add("t_list", t_list);
+  opt.add("out_prefix", out_prefix);
   opt.read_options(argc,argv);
 
 	lname = latname + ".laplacean.eigensystem";
@@ -271,7 +272,7 @@ int main(int argc, char **argv)
   std::stringstream ss;
   ss << std::setfill('0') << std::setw(3) << to_string(cfg);
   cfg_str  = ss.str();
-  corr_file.open("diags_"+to_string(nx)+to_string(ny)+to_string(nz)+to_string(nt)+"_"+cfg_str+".dat");
+  corr_file.open(out_prefix+"diags_"+to_string(nx)+to_string(ny)+to_string(nz)+to_string(nt)+"_"+cfg_str+".dat");
 
   ///Compute the momentum matrices TODO-Displacements: For all mom and displacements
   ///How to select which ones are in operators?
@@ -401,7 +402,7 @@ int main(int argc, char **argv)
   }
   name_file.close();
 
-	
+
 	for(int i=0; i<NDIAGS; ++i){
 		corr_file << diag_names[i] << "\n";
 		for(int i_dt=0; i_dt<unique_dts.size(); ++i_dt){
