@@ -5,7 +5,7 @@
 #include <fstream>
 
 using namespace std;
-using Saved_Traces = map<string, vector<vector<complex<double>>> >;
+using Saved_Diagrams = map<string, map<string,complex<double>>>;
 
 bool file_exists(string filename)
 {
@@ -13,49 +13,30 @@ bool file_exists(string filename)
   return file.good();
 }
 
-Saved_Traces parse_diagram_file(std::string filename, int NT)
+Saved_Diagrams parse_diagram_file(std::string filename, int NT)
 {
 	ifstream input(filename);
   string line;
-  vector<string> all_names;
-  vector<vector<vector<complex<double>>>> all_values;
+  string current_diagram;
+  Saved_Diagrams res;
+
   while(getline(input, line))
   {
-		vector<vector<complex<double>>> tmp_val(NT);
-    /// for dt in dts
-    /// resize( length(ts) )
-    for(int t=0; t<NT; ++t)
-      tmp_val[t].resize(NT);
-
     if(line[0]=='[')
-      all_names.push_back(line);
+      current_diagram=line;
     else
     {
-
-
-      auto idx=0;
-      auto vals=split(line, ' ');
-      for(int i=0; i<NT; ++i)
-        tmp_val[idx][i] = std::complex<double>{stod(vals[2*i]), stod(vals[2*i+1])};
-      idx++;
-      for(int j=1; j<NT; ++j)
-      {
-        getline(input, line);
-        auto vals = split(line, ' ');
-        for(int i=0; i<NT; ++i)
-          tmp_val[idx][i] = std::complex<double>{stod(vals[2*i]), stod(vals[2*i+1])};
-        idx++;
-      }
-      all_values.push_back(tmp_val);
+      auto columns = split(line, ' ');
+      res[current_diagram][columns[0]+" "+columns[1]]=std::complex<double>{stod(columns[2]), stod(columns[3])};
     }
   }
   input.close();
 
-  Saved_Traces computed_traces;
-  for(size_t i=0; i<all_names.size(); ++i)
-    computed_traces[all_names[i]] = all_values[i];
+//  Saved_Traces computed_traces;
+//  for(size_t i=0; i<all_names.size(); ++i)
+//    computed_traces[all_names[i]] = all_values[i];
 
-  return computed_traces;
+  return res;
 
 }
 

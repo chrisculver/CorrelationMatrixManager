@@ -7,7 +7,7 @@
 #include <algorithm>
 
 using namespace std;
-using Saved_Traces = map<string, vector<vector<complex<double>>> >;
+using Saved_Diagrams = map<string, map<string,complex<double>>>;
 
 void Correlator::wick_contract()
 {
@@ -96,7 +96,7 @@ void Correlator::load_wick_contractions(const std::string filename, const int i,
 	in_file.close();
 }
 
-void Correlator::load_numerical_results(Saved_Traces computed)
+void Correlator::load_numerical_results(Saved_Diagrams computed)
 {
 	for(auto& d : diags)
   {
@@ -125,30 +125,35 @@ void Correlator::load_numerical_results(Saved_Traces computed)
 				if(!found)
           throw 'm';
       }
-    }
-  }
+			for(const auto &ti : ts)
+				for(const auto &dt : dts)
+					if( t.numerical_value.count(to_string(dt)+" "+to_string(ti)) == 0 )
+						throw 't';
+		}///end of trace loop
+  }///end of diagram loop
 }
 
 
-void Correlator::compute_time_average_correlators(int NT)
+void Correlator::compute_time_average_correlators()
 {
-  corr_t.resize(NT);
-	for(int dt=0; dt<NT; ++dt)
+  corr_t.resize(dts.size());
+	for(int i=0; i<dts.size(); ++i)
   {
+		int dt = dts[i];
     complex<double> time_avg(0.,0.);
-    for(int t=0; t<NT; ++t)
+    for(const auto &t : ts)
     {
       for(const auto& d : diags)
       {
         complex<double> trace_product(1.,0.);
-        for(const auto& tr : d.traces)
+        for(auto tr : d.traces)
         {
-          trace_product *= tr.numerical_value[dt][t];
+          trace_product *= tr.numerical_value[to_string(dt)+" "+to_string(t)];
         }///end traces
         time_avg += complex<double>(d.coef,0)*trace_product;
       }///end diags
     }///end t
-    corr_t[dt] = time_avg/(double(NT));
+    corr_t[i] = time_avg/(double(ts.size()));
   }///end dt
 
 }

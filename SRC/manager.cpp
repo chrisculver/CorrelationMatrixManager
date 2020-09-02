@@ -209,7 +209,7 @@ void Manager::load_operators()
 	for(size_t j=0; j<ops.size(); ++j)
 	{
 		if(j<=i)
-			corrs.push_back( Correlator(adjoint(ops[i]), ops[j]) );
+			corrs.push_back( Correlator(adjoint(ops[i]), ops[j], ts, dts) );
 		else
 			corrs.push_back( Correlator() );
 	}
@@ -303,9 +303,10 @@ void Manager::load_numerical_results()
 		}
 		catch(char missing)
 		{
+			main_logger->info("load_numerical_results threw {}", missing);
 			vector<string> computed_names;
-			for(const auto &c : computed)
-				computed_names.push_back(c.first);
+			for(const auto &c1 : computed)
+				computed_names.push_back(c1.first);
 			throw traces_to_compute(computed_names);
 		}
 	}
@@ -547,7 +548,7 @@ void Manager::runtime_input_for_cpu(ofstream &file, vector<Trace> need_to_comput
 void Manager::compute_time_average_correlators()
 {
 	for(auto &c: corrs)
-		c.compute_time_average_correlators(lat.nt);
+		c.compute_time_average_correlators();
 }
 
 void Manager::print_correlators()
