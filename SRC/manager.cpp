@@ -209,7 +209,7 @@ void Manager::load_operators()
 	for(size_t j=0; j<ops.size(); ++j)
 	{
 		if(j<=i)
-			corrs.push_back( Correlator(adjoint(ops[i]), ops[j], ts, dts) );
+			corrs.push_back( Correlator(adjoint(ops[j]), ops[i], ts, dts) );
 		else
 			corrs.push_back( Correlator() );
 	}

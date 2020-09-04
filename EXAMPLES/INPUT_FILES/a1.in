@@ -5,5 +5,7 @@ nt 4
 cfg 100
 verbose_logging 1
 operator_filename a1_2448_test.ops
-diagram_prefix /CCAS/home/chrisculver/CorrelationMatrixManager/build/COMPUTE_DIAGRAMS/diags_4444_
-gpu_memory 1024
+diagram_prefix diags_4444_
+gpu_memory 4096
+dts ALL
+ts ALL
