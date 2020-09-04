@@ -134,6 +134,7 @@ void Correlator::load_numerical_results(Saved_Diagrams computed)
 }
 
 
+
 void Correlator::compute_time_average_correlators()
 {
   corr_t.resize(dts.size());
