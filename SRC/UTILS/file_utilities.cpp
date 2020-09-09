@@ -13,7 +13,7 @@ bool file_exists(string filename)
   return file.good();
 }
 
-Saved_Diagrams parse_diagram_file(std::string filename, int NT)
+Saved_Diagrams parse_diagram_file(std::string filename)
 {
 	ifstream input(filename);
   string line;

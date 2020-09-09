@@ -292,8 +292,20 @@ void Manager::load_numerical_results()
 		main_logger->info("No diagram file found");
 		throw traces_to_compute();
 	}
+	map<string, map<string,complex<double>>> computed;
+	// for(const auto d_file : files.diagram_files)
+	//{
+	//		auto new_diags = parse_diagram_file(d_file);
+	//			computed.insert( new_diags.begin(), new_diags.end() );
+	//}
 
-	auto computed = parse_diagram_file(files.diagram_filename, lat.nt);
+	computed = parse_diagram_file(files.diagram_filename);
+
+	///   ./compute a1.in none.data
+	///   ./compute a1.in daigs.dat
+	///   for all diags.dat
+	///       NDIAGS   files_used
+
 
 	for(auto &c: corrs)
 	{

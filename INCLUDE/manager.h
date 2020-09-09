@@ -53,7 +53,7 @@ struct Manager
 	FileNames files;
 	///Holds the amount of memory on GPU
 	long int gpu_memory;
-	///Holds lists of dts and ts to compute for. 
+	///Holds lists of dts and ts to compute for.
 	std::vector<int> dts,ts;
 
 	std::vector<Operator> ops;

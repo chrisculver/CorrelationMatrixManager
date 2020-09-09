@@ -9,7 +9,7 @@
 
 bool file_exists(std::string filename);
 
-std::map<std::string, std::map<std::string,std::complex<double>>> parse_diagram_file(std::string filename, int NT);
+std::map<std::string, std::map<std::string,std::complex<double>>> parse_diagram_file(std::string filename);
 
 std::string cpp_prefix();
 std::string cpp_postfix();

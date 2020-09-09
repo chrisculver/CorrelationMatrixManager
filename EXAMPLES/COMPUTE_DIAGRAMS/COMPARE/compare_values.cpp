@@ -1,5 +1,5 @@
 ///I submitted some jobs with leading integers for which time slice the diagram was
-///computed on but this is redundant info and I want it gone.  
+///computed on but this is redundant info and I want it gone.
 ///This code takes one of those files and converts it
 
 #include "string_utilities.h"
@@ -16,7 +16,7 @@ using namespace std;
 
 
 ///from stackoverflow "How should I do floating point comparison?"
-bool nearly_equal(float a, float b, 
+bool nearly_equal(float a, float b,
 									float epsilon=FLT_EPSILON, float rel = FLT_MIN)
 {
 	assert(std::numeric_limits<double>::epsilon() <= epsilon);
@@ -54,8 +54,8 @@ int main(int argc, char **argv)
   ifstream cpu_file(cpu_results_name);
 	ifstream gpu_file(gpu_results_name);
   std::vector<string> lines;
-  
-  string line; 
+
+  string line;
 	vector<string> cpu_lines, gpu_lines;
   int n_lines=0;
   while(getline(cpu_file, line))
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 	{
 		vector<string> c_line = split(cpu_lines[n],' ');
 		vector<string> g_line = split(gpu_lines[n],' ');
-		
+
 		for(size_t i=0; i<c_line.size(); ++i)
 		{
 			vector<string> tmp = split(c_line[i],'e');
@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 			complex<double> g_val(stod(g_line[i]), stod(c_line[i+1]));
 
 			if( !nearly_equal_abs(c_val, g_val) )
-			{	
+			{
 				cout << "found two numbers not nearly equal on line " << n << endl;
 				cout << "they are cpu=" << c_val << "   |   gpu=" << g_val << endl;
 				diffs = true;
