@@ -7,13 +7,13 @@
 using namespace std;
 using Saved_Diagrams = map<string, map<string,complex<double>>>;
 
-vector<string> load_diagram_filenames(string file)
+vector<string> load_diagram_filenames(string file, string cfg)
 {
   ifstream input(file);
   string line;
   vector<string> res;
   while(getline(input,line))
-    res.push_back(line);
+    res.push_back(line+cfg+".dat");
 
   input.close();
   return res;

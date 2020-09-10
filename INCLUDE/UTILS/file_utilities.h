@@ -7,7 +7,7 @@
 #include <string>
 #include <complex>
 
-std::vector<std::string> load_diagram_filenames(std::string file);
+std::vector<std::string> load_diagram_filenames(std::string file, std::string cfg);
 
 bool file_exists(std::string filename);
 

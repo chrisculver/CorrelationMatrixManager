@@ -118,7 +118,7 @@ void Manager::load_input(string input_filename)
 	//			+to_string(lat.nz)+to_string(lat.nt)+"_"+cfg_to_string(lat.cfg)+".dat");
 
 	files = FileNames(name_value["operator_filename"],
-					load_diagram_filenames(name_value["diagram_files"]));
+					load_diagram_filenames(name_value["diagram_files"],cfg_to_string(lat.cfg)));
 	name_value.erase("operator_filename");
 	name_value.erase("diagram_files");
 

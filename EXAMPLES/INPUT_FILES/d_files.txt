@@ -1,3 +1,3 @@
-diags.dat
-diags_2.dat
-diags_3.dat
+diags_cfg
+diags_2cfg
+diags_3cfg
