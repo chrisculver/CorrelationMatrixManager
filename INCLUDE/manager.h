@@ -25,10 +25,10 @@ struct FileNames
 	///Holds the operator lists
 	std::string operator_filename;
 	///Holds the diagrams for the given lattice
-	std::string diagram_filename;
+	std::vector<std::string> diagram_files;
 
-	FileNames(){operator_filename="";diagram_filename="";};
-	FileNames(std::string o_f, std::string d_f):operator_filename(o_f),diagram_filename(d_f){};
+	FileNames(){operator_filename="";diagram_files=std::vector<std::string>{};};
+	FileNames(std::string o_f, std::vector<std::string> d_fs):operator_filename(o_f),diagram_files(d_fs){};
 
 };
 

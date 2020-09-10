@@ -3,7 +3,7 @@ project("Correlation Matrix Manager")
 
 SET(GCC_COMPILE_FLAGS "-std=c++17 -O3")
 
-include_directories(INCLUDE $ENV{HOME}/Code/Libraries/gwu-qcd/include $ENV{HOME}/Code/Libraries/spdlog/include/)
+include_directories(INCLUDE $ENV{HOME}/Code/Libraries/spdlog/include/)
 file(GLOB SOURCES "SRC/*.cpp" "SRC/UTILS/*.cpp" "SRC/OPS/*.cpp" "SRC/DIAGS/*.cpp" main.cpp)
 
 add_executable(compute_correlation_matrix ${SOURCES})

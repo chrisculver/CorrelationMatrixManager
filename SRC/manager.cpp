@@ -116,13 +116,18 @@ void Manager::load_input(string input_filename)
 
 	//files = FileNames(name_value["operator_filename"], "diags_"+to_string(lat.nx)+to_string(lat.ny)
 	//			+to_string(lat.nz)+to_string(lat.nt)+"_"+cfg_to_string(lat.cfg)+".dat");
-	files = FileNames(name_value["operator_filename"],
-					name_value["diagram_prefix"]+cfg_to_string(lat.cfg)+".dat");
-	name_value.erase("operator_filename");
-	name_value.erase("diagram_prefix");
 
-	main_logger->info("Loaded filenames\noperator_filename = {} | diagram_filename = {}\n",
-									  files.operator_filename, files.diagram_filename );
+	files = FileNames(name_value["operator_filename"],
+					load_diagram_filenames(name_value["diagram_files"]));
+	name_value.erase("operator_filename");
+	name_value.erase("diagram_files");
+
+	main_logger->info("Loaded operator_filename = {} \n",
+									  files.operator_filename );
+
+	main_logger->info("Using these diagram files");
+	for(const auto &d : files.diagram_files)
+		main_logger->info("{}",d);
 
 	if(!verbose_logging)
 		main_logger->info("Loaded all input data\n");
@@ -231,7 +236,7 @@ void Manager::wick_contractions()
 	for(size_t i=0; i<ops.size(); ++i)
 	for(size_t j=0; j<ops.size(); ++j)
 	{
-	//	cout << "wick contraction for c_ij = " << i << " " << j << endl;
+	//	cout << "effectively reduces the container size by the number of elementswick contraction for c_ij = " << i << " " << j << endl;
 		if(load==false)
 		{
 			corrs[i*ops.size() +j].wick_contract();
@@ -287,19 +292,36 @@ void Manager::wick_contractions()
 void Manager::load_numerical_results()
 {
 	auto main_logger = spdlog::get("main");
-	if( !file_exists(files.diagram_filename) )
+
+	for(size_t i=0; i<files.diagram_files.size(); ++i)
 	{
-		main_logger->info("No diagram file found");
+		if(!file_exists(files.diagram_files[i]))
+		{
+			main_logger->info("Diagram file {} not found", files.diagram_files[i]);
+			files.diagram_files.erase(files.diagram_files.begin()+i);
+		}
+	}
+
+	if( files.diagram_files.size()==0 )
+	{
+		main_logger->info("No diagram files found");
 		throw traces_to_compute();
 	}
-	map<string, map<string,complex<double>>> computed;
-	// for(const auto d_file : files.diagram_files)
-	//{
-	//		auto new_diags = parse_diagram_file(d_file);
-	//			computed.insert( new_diags.begin(), new_diags.end() );
-	//}
 
-	computed = parse_diagram_file(files.diagram_filename);
+	map<string, map<string,complex<double>>> computed;
+	for(const auto d_file : files.diagram_files)
+	{
+			auto new_diags = parse_diagram_file(d_file);
+			for(const auto &d : new_diags)
+			{
+				if(computed.count(d.first)==0)
+					computed[d.first]=d.second;
+				else
+					computed[d.first].insert(d.second.begin(), d.second.end());
+			}
+	}
+
+	//computed = parse_diagram_file(files.diagram_filename);
 
 	///   ./compute a1.in none.data
 	///   ./compute a1.in daigs.dat
@@ -316,6 +338,14 @@ void Manager::load_numerical_results()
 		catch(char missing)
 		{
 			main_logger->info("load_numerical_results threw {}", missing);
+			if(missing == 't')
+			{
+				std::cout << "WARNING: OUTPUTTING ALL TRACES - NO LOOKUP";
+				main_logger->info("throwing t, missing diagram routine isn't implemented");
+				/// This is because all diagram names match, only certain diagrams will
+				/// be missing a certain set of dt, t combos.
+				throw traces_to_compute();
+			}
 			vector<string> computed_names;
 			for(const auto &c1 : computed)
 				computed_names.push_back(c1.first);

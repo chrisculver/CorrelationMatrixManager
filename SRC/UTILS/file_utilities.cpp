@@ -7,6 +7,18 @@
 using namespace std;
 using Saved_Diagrams = map<string, map<string,complex<double>>>;
 
+vector<string> load_diagram_filenames(string file)
+{
+  ifstream input(file);
+  string line;
+  vector<string> res;
+  while(getline(input,line))
+    res.push_back(line);
+
+  input.close();
+  return res;
+}
+
 bool file_exists(string filename)
 {
   ifstream file(filename.c_str());

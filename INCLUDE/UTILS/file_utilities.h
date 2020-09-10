@@ -7,6 +7,8 @@
 #include <string>
 #include <complex>
 
+std::vector<std::string> load_diagram_filenames(std::string file);
+
 bool file_exists(std::string filename);
 
 std::map<std::string, std::map<std::string,std::complex<double>>> parse_diagram_file(std::string filename);
