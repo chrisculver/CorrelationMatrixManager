@@ -13,7 +13,7 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 {
 	auto wick_logger = spdlog::get("wick");
 	wick_logger->debug("Contracting elementals");
-	
+
 	char label = 'a';
 	map<char, Meson> meson_map;
 	map<char, char> time_map;
@@ -22,11 +22,11 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 	for(const auto &m: a.mesons)
 	{
 		barred.push_back( ShortQuark(true, m.ql, label) );
-		unbarred.push_back( ShortQuark(false, m.qr, label) );	
+		unbarred.push_back( ShortQuark(false, m.qr, label) );
 		meson_map.insert(pair<char, Meson>(label, m));
 		time_map.insert(pair<char, char>(label, 'f'));
 		label++;
-	}	
+	}
 	for(const auto &m: c.mesons)
 	{
 		barred.push_back( ShortQuark(true, m.ql, label) );
@@ -44,7 +44,7 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 	//for(size_t i=0; i<unbarred.size(); ++i)
 	//	cout << unbarred[i].barred << "-" << unbarred[i].flavor << "_" << unbarred[i].label << " ";
 	//cout << endl;
-	heaps_algorithm_anticommuting( all_barred_permutations, barred, barred.size(), 
+	heaps_algorithm_anticommuting( all_barred_permutations, barred, barred.size(),
 																 all_signs, starting_sign );
 	wick_logger->debug("Finished heaps algorithm");
 	/*
@@ -62,7 +62,7 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 				const auto q = unbarred[j];
 				all_permutes_string += to_string(qbar.barred)+"-"+qbar.flavor+"_"+qbar.label+" ";
 				all_permutes_string += to_string(q.barred)+"-"+q.flavor+"_"+q.label+" ";
-			
+
 			}
 			all_permutes_string += "\n";
 		}
@@ -89,18 +89,22 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 			bool all_contracted = false;
 			bool new_trace_loop = false;
 			int q = 0;///current quark we are on, start at beginning
-			///Start at quark q=0.  Make the quark line for unbarred to barred. 
-			///Find the quark it goes to next by label.  
+			///Start at quark q=0.  Make the quark line for unbarred to barred.
+			///Find the quark it goes to next by label.
 			///Exit when all quarks are used
 			char starting_meson = unbarred[q].label;
 			while(!all_contracted)
 			{
 //				cout << "q=" << q << "  |  m.label=" << lst[q].label << "  |  starting_meson=" << starting_meson << endl;
-				Meson m = meson_map[unbarred[q].label];			
-				t.qls.push_back( QuarkLine(time_map[unbarred[q].label], m, time_map[lst[q].label]) );
+				Meson m = meson_map[unbarred[q].label];
+				char p_fl = m.qr;
+				if((p_fl == 'u') || (p_fl == 'd'))
+					p_fl='l';
+
+				t.qls.push_back( QuarkLine(time_map[unbarred[q].label], p_fl, m.gamma, m.displacement, m.mom, time_map[lst[q].label]) );
 				q_contracted[q]=true;
-				
-				if(lst[q].label == starting_meson)	
+
+				if(lst[q].label == starting_meson)
 				{
 					d.traces.push_back(t);
 					t.qls.clear();
@@ -110,7 +114,7 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 				all_contracted=true;
 				for(size_t i=0; i<q_contracted.size(); ++i)
 					all_contracted = all_contracted && q_contracted[i];
-				
+
 				///Find the meson we are attached to.
 				if(new_trace_loop)
 				{
@@ -127,18 +131,18 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 				{
 					for(size_t i=0; i<unbarred.size(); ++i)
 						if(lst[q].label == unbarred[i].label)
-						{	
+						{
 							q=i;
 							break;
 						}
 				}
 			}
-			
+
 //			cout << endl;
 		  if(all_signs[i])
         d.coef=-1*a.coef*c.coef;
       else
-        d.coef=a.coef*c.coef;  
+        d.coef=a.coef*c.coef;
 
 			///We used a list \bar{q} q \cdots \bar{q} q but props are
 			///formed from q \bar{q}, -1^N_mesons factor needs to be applied
@@ -149,8 +153,8 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 
       res.push_back(d);
 		}
-	}		
-	
+	}
+
 //	cout << "The following diagrams are being added to the correlator\n";
 //	for(const auto &d: res)
 //	{

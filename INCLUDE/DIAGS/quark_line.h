@@ -13,16 +13,19 @@
 class QuarkLine
 {
 	public:
+		char flavor; ///flavor of the propagator , 'l'/'s'/'c'...
 		std::string gamma;
 		std::string displacement;
 		std::string mom;
 		char ti, tf;
 
 		QuarkLine(){};
-		QuarkLine(char i, std::string g, std::string d, std::string m, char f):
-			ti(i),gamma(g),displacement(d),mom(m),tf(f){};
-		QuarkLine(char i, Meson m, char f):
-			ti(i),gamma(m.gamma), displacement(m.displacement), mom(m.mom), tf(f){};
+		QuarkLine(char i, char fl, std::string g, std::string d, std::string m, char f):
+			ti(i),flavor(fl),gamma(g),displacement(d),mom(m),tf(f){};
+///   deprecated until I figure out whether the QL prop comes from the
+///   bar or unbarred quark.
+///		QuarkLine(char i, Meson m, char f):
+///			ti(i),gamma(m.gamma), displacement(m.displacement), mom(m.mom), tf(f){};
 
 };
 

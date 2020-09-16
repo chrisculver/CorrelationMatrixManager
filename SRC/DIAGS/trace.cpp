@@ -10,11 +10,13 @@ bool operator==(const Trace &l, const Trace &r)
 string Trace::name() const
 {
 	string name;
-	name+="[ ";	
+	name+="[ ";
 	for(size_t i=0; i<qls.size(); ++i)
 	{
 		auto q=qls[i];
-		name+=q.gamma + " " + q.displacement + " " + q.mom + " " + q.ti + " " + q.tf;
+		stringstream tmp;
+		tmp << q.flavor << " " << q.gamma << " " << q.displacement << " " << q.mom << " " << q.ti << " " << q.tf;
+		name += tmp.str();
 		if(i!=qls.size()-1)
 			name+=" | ";
 		else
@@ -22,7 +24,7 @@ string Trace::name() const
 	}
 	name+="]";
 
-	return name;	
+	return name;
 }
 
 
@@ -34,15 +36,19 @@ vector<string> Trace::compute_name(vector<string> u_mom, vector<string> u_disp, 
   vector<string> name(qls.size(),"");
   for(size_t i=0; i<qls.size(); ++i)
   {
-    char t1(qls[i].ti), t2(qls[i].tf);
-    if(t1=='i' && t2=='i')
-      name[i]+="qti[";
+    char t1(qls[i].ti), t2(qls[i].tf), fl(qls[i].flavor);
+		stringstream tmp;
+		if(t1=='i' && t2=='i')
+      tmp << "qti";
     else if(t1=='i' && t2=='f')
-      name[i]+="qf[";
+      tmp << "qf";
     else if(t1=='f' && t2=='i')
-      name[i]+="qb[";
+      tmp << "qb";
     else if(t1=='f' && t2=='f')
-      name[i]+="qtf[";
+      tmp << "qtf";
+
+		tmp << "_" << fl << "[";
+		name[i]+= tmp.str();
 
     for(size_t s=0; s<u_gamma.size(); ++s)
       if(qls[i].gamma==u_gamma[s])

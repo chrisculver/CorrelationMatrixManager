@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -15,7 +16,9 @@ std::string Diagram::name() const
 		for(size_t i=0; i<t.qls.size(); ++i)
 		{
 			auto q=t.qls[i];
-			name+=q.gamma + " " + q.displacement + " " + q.mom + " " + q.ti + " " + q.tf;
+			stringstream tmp;
+			tmp << q.flavor << " " << q.gamma << " " << q.displacement << " " << q.mom << " " << q.ti << " " << q.tf;
+			name += tmp.str();
 			if(i!=t.qls.size()-1)
 				name+=" | ";
 			else

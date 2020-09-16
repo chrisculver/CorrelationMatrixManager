@@ -21,5 +21,5 @@ set_target_properties(
  )
 
 # Set up the documentation
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMAKE" ${CMAKE_MODULE_PATH})
-add_subdirectory("DOCS")
+#set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMAKE" ${CMAKE_MODULE_PATH})
+#add_subdirectory("DOCS")
