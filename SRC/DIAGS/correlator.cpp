@@ -103,8 +103,20 @@ void Correlator::load_numerical_results(Saved_Diagrams computed)
 		for(auto& t : d.traces)
     {
       if( computed.count(t.name()) > 0 )
-        t.numerical_value = computed[t.name()];
-      else
+			{
+        //t.numerical_value = computed[t.name()];
+				t.numerical_value.resize(dts.size());
+				for(size_t i=0; i<dts.size(); ++i)
+					t.numerical_value[i].resize(ts.size());
+
+				///go through the map efficiently.
+				for(auto &kv : computed[t.name()])
+				{
+					vector<string> dt_t = split(kv.first, ' ');
+					t.numerical_value[stoi(dt_t[0])][stoi(dt_t[1])] = kv.second;
+				}
+			}
+			else
       {
 				///Search for cyclic permutations of the trace.
 				Trace r = t;
@@ -116,7 +128,21 @@ void Correlator::load_numerical_results(Saved_Diagrams computed)
 					rotate(r.qls.begin(), r.qls.begin()+1, r.qls.end());
 					if( computed.count(r.name()) > 0 )
 					{
-						t.numerical_value = computed[r.name()];
+						for(const auto & kv: computed[r.name()])
+						{
+							//t.numerical_value = computed[r.name()];
+
+							t.numerical_value.resize(dts.size());
+							for(size_t i=0; i<dts.size(); ++i)
+								t.numerical_value[i].resize(ts.size());
+
+							///go through the map efficiently.
+							for(auto &kv : computed[r.name()])
+							{
+								vector<string> dt_t = split(kv.first, ' ');
+								t.numerical_value[stoi(dt_t[0])][stoi(dt_t[1])] = kv.second;
+							}
+						}
 						found=true;
 						break;
 					}
@@ -125,10 +151,10 @@ void Correlator::load_numerical_results(Saved_Diagrams computed)
 				if(!found)
           throw 'm';
       }
-			for(const auto &ti : ts)
-				for(const auto &dt : dts)
-					if( t.numerical_value.count(to_string(dt)+" "+to_string(ti)) == 0 )
-						throw 't';
+		//	for(const auto &ti : ts)
+		//		for(const auto &dt : dts)
+		//			if( t.numerical_value.count(to_string(dt)+" "+to_string(ti)) == 0 )
+		//				throw 't';
 		}///end of trace loop
   }///end of diagram loop
 }
@@ -149,7 +175,7 @@ void Correlator::compute_time_average_correlators()
         complex<double> trace_product(1.,0.);
         for(auto tr : d.traces)
         {
-          trace_product *= tr.numerical_value[to_string(dt)+" "+to_string(t)];
+          trace_product *= tr.numerical_value[dt][t];
         }///end traces
         time_avg += complex<double>(d.coef,0)*trace_product;
       }///end diags
