@@ -168,9 +168,9 @@ void Correlator::compute_time_average_correlators()
   {
 		int dt = dts[i];
     complex<double> time_avg(0.,0.);
-    for(const auto &t : ts)
+    for(auto &t : ts)
     {
-      for(const auto& d : diags)
+      for(auto& d : diags)
       {
         complex<double> trace_product(1.,0.);
         for(auto &tr : d.traces)
