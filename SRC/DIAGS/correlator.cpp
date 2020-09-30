@@ -173,7 +173,7 @@ void Correlator::compute_time_average_correlators()
       for(const auto& d : diags)
       {
         complex<double> trace_product(1.,0.);
-        for(auto tr : d.traces)
+        for(auto &tr : d.traces)
         {
           trace_product *= tr.numerical_value[dt][t];
         }///end traces
