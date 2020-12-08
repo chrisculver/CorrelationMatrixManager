@@ -233,6 +233,9 @@ void Manager::wick_contractions()
 	if(file_exists(wick_file))
 		load=true;
 
+	auto wick_logger = spdlog::get("wick");
+	auto main_logger = spdlog::get("main");
+
 	for(size_t i=0; i<ops.size(); ++i)
 	for(size_t j=0; j<ops.size(); ++j)
 	{
@@ -240,7 +243,7 @@ void Manager::wick_contractions()
 		if(load==false)
 		{
 			corrs[i*ops.size() +j].wick_contract();
-			auto wick_logger = spdlog::get("wick");
+
 			std::string diag_names;
 			for(const auto &d: corrs[i*ops.size() + j].diags)
 			{
@@ -251,6 +254,7 @@ void Manager::wick_contractions()
 
 			}
 			wick_logger->info("Resulting diags for c_{}.{}={}", i, j, diag_names);
+			main_logger->info("Finished contraction for c_{}.{}",i,j);
 		}
 		else
 		{
