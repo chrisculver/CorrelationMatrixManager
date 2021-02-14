@@ -2,6 +2,8 @@
 #include "UTILS/wick.h"
 #include "UTILS/string_utilities.h"
 
+#include "spdlog/spdlog.h"
+
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -11,15 +13,22 @@ using Saved_Diagrams = map<string, map<string,complex<double>>>;
 
 void Correlator::wick_contract()
 {
+	auto wick_logger = spdlog::get("wick");
+
 	vector<Diagram> new_diags;
 	for(const auto &c_e: c.terms)
 	for(const auto &a_e: a.terms)
 	{
-		new_diags=wick_contract_elems(c_e, a_e);
-		///First consolidate the diagrams returned amongst themselves.
+		wick_logger->debug("Doing elemental_"+
+												to_string(&c_e - &c.terms[0])+
+												to_string(&a_e - &a.terms[0]));
 
+		new_diags=wick_contract_elems(c_e, a_e);
+
+		wick_logger->debug("Done with elemental, adding to diags");
 		///push some diags into diags
 		///not duplicating elements
+
 		for(const auto &d: new_diags)
 		{
 			auto equivalent_diags = d.all_cyclic_related_diagrams();
@@ -35,20 +44,27 @@ void Correlator::wick_contract()
 						{
 							found=true;
 							diags[e].coef+=d.coef;
+							///try to keep the list small...
+							if(diags[e].coef==0)
+								diags.erase( diags.begin() + e );
+							break;
 						}
 					}
 				}
+				else
+					break;
 			}
 			if(!found)
 				diags.push_back(d);
 
 		}
+		wick_logger->debug("done adding new_diags");
 	}
 
+	///double check for zero diags
 	for(auto it = diags.begin(); it != diags.end(); it++)
 		if( (*it).coef == 0)
 			diags.erase(it--);
-
 }
 
 void Correlator::load_wick_contractions(const std::string filename, const int i, const int j)

@@ -158,6 +158,7 @@ void Manager::create_logs()
   ///Just doing one extra type of output - debug/verbose
   auto wick_logger = spdlog::basic_logger_mt("wick", "logs/wick_"+cfg_to_string(lat.cfg)+".log");
 	auto op_logger = spdlog::basic_logger_mt("op", "logs/op_"+cfg_to_string(lat.cfg)+".log");
+	wick_logger->set_level(spdlog::level::debug);
 }
 
 void Manager::load_operators()
@@ -228,6 +229,7 @@ void Manager::wick_contractions()
 {
 //	for(auto &c: corrs)
 //		c.wick_contract();
+
 	bool load = false;
 	string wick_file = "logs/" + files.operator_filename + ".wick";
 	if(file_exists(wick_file))
@@ -239,6 +241,8 @@ void Manager::wick_contractions()
 	for(size_t i=0; i<ops.size(); ++i)
 	for(size_t j=0; j<ops.size(); ++j)
 	{
+
+		main_logger->info("Starting contractions for c_{}.{}",i,j);
 	//	cout << "effectively reduces the container size by the number of elementswick contraction for c_ij = " << i << " " << j << endl;
 		if(load==false)
 		{
@@ -361,6 +365,9 @@ void Manager::load_numerical_results()
 
 vector<Trace> Manager::traces_to_compute()
 {
+
+	auto main_logger = spdlog::get("main");
+  main_logger->info("Organizing traces to compute with none computed");
 	vector<Trace> res;
 	for(auto &c: corrs)
 	for(auto &d: c.diags)
@@ -377,12 +384,14 @@ vector<Trace> Manager::traces_to_compute()
 		if(!found)
 			res.push_back(t);
 	}
-
+	main_logger->info("Done organizing");
 	return res;
 }
 
 vector<Trace> Manager::traces_to_compute(const vector<string> computed_names)
 {
+	auto main_logger = spdlog::get("main");
+	main_logger->info("Organizing traces to compute with some computed");
 	vector<Trace> res;
 	for(auto &c: corrs)
 	for(auto &d: c.diags)
@@ -401,7 +410,7 @@ vector<Trace> Manager::traces_to_compute(const vector<string> computed_names)
 		if(!found)
 			res.push_back(t);
 	}
-
+	main_logger->info("Done organizing");
 	return res;
 }
 
@@ -409,6 +418,8 @@ vector<Trace> Manager::traces_to_compute(const vector<string> computed_names)
 
 void Manager::cpu_code_output(ofstream &file, vector<Trace> need_to_compute)
 {
+	auto main_logger = spdlog::get("main");
+	main_logger->info("Generating cpp file to compute traces");
   file << cpp_prefix();
   ///The important bit, depends on diagrams!
   vector<string> unique_mom, unique_disp, unique_gamma;
@@ -528,7 +539,7 @@ void Manager::cpu_code_output(ofstream &file, vector<Trace> need_to_compute)
         file << "diag[" << d << "][dt][t] = res" << l+1 << "[" << res_idx[d] << "].trace();" << endl;
 
   file << cpp_postfix();
-
+	main_logger->info("CPU code output");
 }
 
 void Manager::diagram_names_output(ofstream &file, vector<Trace> need_to_compute)
@@ -611,6 +622,8 @@ void Manager::print_correlators()
 
 void Manager::shutdown()
 {
+	auto main_logger = spdlog::get("main");
+	main_logger->info("Program done");
 	spdlog::shutdown();
 }
 
@@ -619,7 +632,8 @@ void Manager::shutdown()
 
 void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace> need_to_compute)
 {
-
+	auto main_logger = spdlog::get("main");
+	main_logger->info("Generating gpu code to compute traces");
 	vector<string> unique_mom, unique_disp, unique_gamma;
 	for(const auto& t : need_to_compute)
 		for(const auto& q : t.qls)
@@ -865,7 +879,7 @@ void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace
 
 
 	cppfile << gpu_code_cpp_postfix();
-
+	main_logger->info("GPU code output");
 }
 
 
