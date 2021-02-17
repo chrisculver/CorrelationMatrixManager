@@ -6,18 +6,19 @@
 #include <string>
 #include <vector>
 
-class Diagram
+template <class QL_Type>
+ class Diagram
 {
 	public:
-		std::vector<Trace> traces;
+		std::vector<Trace<QL_Type>> traces;
 		int coef;
-	
+
 	Diagram(){coef=0;};
-	Diagram(int c, std::vector<Trace> t):coef(c), traces(t){};
+	Diagram(int c, std::vector<Trace<QL_Type>> t):coef(c), traces(t){};
 
 	std::string name() const;
 
-	std::vector<std::vector<Trace>> all_cyclic_related_diagrams() const;
+	std::vector<std::vector<Trace<QL_Type>>> all_cyclic_related_diagrams() const;
 };
 
 

@@ -9,12 +9,13 @@
 #include <map>
 #include <string>
 
+template <class QL_Type>
 class Correlator
 {
 	public:
 		const Operator c, a;
 
-		std::vector<Diagram> diags;
+		std::vector<Diagram<QL_Type>> diags;
 
 		std::vector<std::complex<double>> corr_t;
 

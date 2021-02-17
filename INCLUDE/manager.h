@@ -58,7 +58,7 @@ struct Manager
 
 	std::vector<Operator> ops;
 
-	std::vector<Correlator> corrs;
+	std::vector<Correlator<QuarkLine>> corrs;
 
 	Manager(){};
 
@@ -77,13 +77,13 @@ struct Manager
 	///This function loads the diagrams from a file(s).
 	void load_numerical_results();
 
-	std::vector<Trace> traces_to_compute();
-	std::vector<Trace> traces_to_compute(const std::vector<std::string> computed_names);
+	std::vector<Trace<QuarkLine>> traces_to_compute();
+	std::vector<Trace<QuarkLine>> traces_to_compute(const std::vector<std::string> computed_names);
 
-	void cpu_code_output(std::ofstream &file, std::vector<Trace> need_to_compute);
-	void gpu_code_output(std::ofstream &cppfile, std::ofstream &gpufile, std::vector<Trace> need_to_compute);
-	void diagram_names_output(std::ofstream &file, std::vector<Trace> need_to_compute);
-	void runtime_input_for_cpu(std::ofstream &file, std::vector<Trace> need_to_compute);
+	void cpu_code_output(std::ofstream &file, std::vector<Trace<QuarkLine>> need_to_compute);
+	void gpu_code_output(std::ofstream &cppfile, std::ofstream &gpufile, std::vector<Trace<QuarkLine>> need_to_compute);
+	void diagram_names_output(std::ofstream &file, std::vector<Trace<QuarkLine>> need_to_compute);
+	void runtime_input_for_cpu(std::ofstream &file, std::vector<Trace<QuarkLine>> need_to_compute);
 
 
 	///This function multiplies traces and averages over time slices

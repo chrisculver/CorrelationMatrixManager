@@ -3,7 +3,7 @@
 #include "UTILS/string_utilities.h"
 
 #include <iostream>
-#include <fstream> 	
+#include <fstream>
 #include <string>
 #include <map>
 
@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 		///to the length of the diagram and load all those traces, then next size, etc.
 		run.load_numerical_results();
 	}
-	catch(vector<Trace> need_to_compute)
+	catch(vector<Trace<QuarkLine>> need_to_compute)
 	{
 		ofstream cpu_code("define_diagrams.cpp");
 		run.cpu_code_output(cpu_code, need_to_compute);

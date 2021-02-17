@@ -6,7 +6,8 @@
 
 using namespace std;
 
-std::string Diagram::name() const
+
+template <> std::string Diagram<QuarkLine>::name() const
 {
 	std::string name(to_string(coef));
 	for(const auto &t: traces)
@@ -28,7 +29,7 @@ std::string Diagram::name() const
 }
 
 
-vector<vector<Trace>> Diagram::all_cyclic_related_diagrams() const
+template <> vector<vector<Trace<QuarkLine>>> Diagram<QuarkLine>::all_cyclic_related_diagrams() const
 {
 	///This finds ALL diagrams that are related by cyclic permutations.
 	/// [ A B ] [ C D ]
@@ -38,7 +39,7 @@ vector<vector<Trace>> Diagram::all_cyclic_related_diagrams() const
 
 	///the vector of traces the algorithm starts at
 	auto start = traces;
-	vector<vector<vector<Trace>>> tmp(start.size()+1);
+	vector<vector<vector<Trace<QuarkLine>>>> tmp(start.size()+1);
 
 	heaps_algorithm(tmp[0], start, start.size());
 

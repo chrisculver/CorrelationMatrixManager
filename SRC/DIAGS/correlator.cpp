@@ -1,21 +1,27 @@
 #include "DIAGS/correlator.h"
 #include "UTILS/wick.h"
 #include "UTILS/string_utilities.h"
+#include "DIAGS/quark_line.h"
 
 #include "spdlog/spdlog.h"
 
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <map>
 
 using namespace std;
 using Saved_Diagrams = map<string, map<string,complex<double>>>;
 
-void Correlator::wick_contract()
+//Correlator<QuarkLine>;
+
+template<> void Correlator<QuarkLine>::wick_contract()
 {
 	auto wick_logger = spdlog::get("wick");
 
-	vector<Diagram> new_diags;
+	vector<Diagram<QuarkLine>> new_diags;
+
+
 	for(const auto &c_e: c.terms)
 	for(const auto &a_e: a.terms)
 	{
@@ -23,7 +29,7 @@ void Correlator::wick_contract()
 												to_string(&c_e - &c.terms[0])+
 												to_string(&a_e - &a.terms[0]));
 
-		new_diags=wick_contract_elems(c_e, a_e);
+		new_diags=wick_contract_elems<QuarkLine>(c_e, a_e);
 
 		wick_logger->debug("Done with elemental, adding to diags");
 		///push some diags into diags
@@ -67,7 +73,7 @@ void Correlator::wick_contract()
 			diags.erase(it--);
 }
 
-void Correlator::load_wick_contractions(const std::string filename, const int i, const int j)
+template <> void Correlator<QuarkLine>::load_wick_contractions(const std::string filename, const int i, const int j)
 {
 	ifstream in_file(filename);
 
@@ -81,12 +87,12 @@ void Correlator::load_wick_contractions(const std::string filename, const int i,
 			vector<string> diag_text = split(equals_split[1],'+');
 			for(auto &term : diag_text)
 			{
-				Diagram d;
+				Diagram<QuarkLine> d;
 				vector<string> trs_text = split(term,'[');
 				d.coef = stoi(trs_text[0]);
 				for(size_t i=1; i<trs_text.size(); ++i)
 				{
-					Trace t;
+					Trace<QuarkLine> t;
 					vector<string> qls_text = split(trs_text[i],'|');
 					for(size_t j=0; j<qls_text.size(); ++j)
 					{
@@ -112,7 +118,7 @@ void Correlator::load_wick_contractions(const std::string filename, const int i,
 	in_file.close();
 }
 
-void Correlator::load_numerical_results(Saved_Diagrams computed)
+template <> void Correlator<QuarkLine>::load_numerical_results(Saved_Diagrams computed)
 {
 	for(auto& d : diags)
   {
@@ -123,7 +129,7 @@ void Correlator::load_numerical_results(Saved_Diagrams computed)
       else
       {
 				///Search for cyclic permutations of the trace.
-				Trace r = t;
+				Trace<QuarkLine> r = t;
 				bool found = false;
 
 				///TODO is this one extra permutation then necessary?
@@ -151,7 +157,7 @@ void Correlator::load_numerical_results(Saved_Diagrams computed)
 
 
 
-void Correlator::compute_time_average_correlators()
+template <> void Correlator<QuarkLine>::compute_time_average_correlators()
 {
   corr_t.resize(dts.size());
 	for(int i=0; i<dts.size(); ++i)

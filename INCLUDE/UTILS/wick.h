@@ -15,7 +15,7 @@ struct ShortQuark
 	char flavor;
 	///label supressing all other indices
 	char label;
-	///So that struct is 4 bytes.  
+	///So that struct is 4 bytes.
 	char Padding;
 
 	ShortQuark(bool b, char f, char l):barred(b), flavor(f), label(l){};
@@ -26,7 +26,7 @@ struct ShortQuark
 	}
 };
 
-std::vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c);
+template <class QL_Type> std::vector<Diagram<QL_Type>> wick_contract_elems(const ElementalOp &a, const ElementalOp &c);
 
 
 template <class T>
@@ -50,10 +50,10 @@ void heaps_algorithm(
 
 template <class T>
 void heaps_algorithm_anticommuting(
-		std::vector< std::vector<T> > &dest, std::vector<T> &src, int size, 
+		std::vector< std::vector<T> > &dest, std::vector<T> &src, int size,
 		std::vector<bool> &coef, bool &c)
 {
-	
+
 	if(size==1)
 	{
 		dest.push_back(src);
@@ -82,7 +82,7 @@ void heaps_algorithm_anticommuting(
 		}
 		if( src != old_src)
 			c=!c;
-/*	
+/*
 		cout << "List after swap\n";
 		cout << c << " ";
 		for(size_t i=0; i<src.size(); ++i)

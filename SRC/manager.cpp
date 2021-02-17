@@ -215,9 +215,9 @@ void Manager::load_operators()
 	for(size_t j=0; j<ops.size(); ++j)
 	{
 		if(j<=i)
-			corrs.push_back( Correlator(adjoint(ops[i]), ops[j], ts, dts) );
+			corrs.push_back( Correlator<QuarkLine>(adjoint(ops[i]), ops[j], ts, dts) );
 		else
-			corrs.push_back( Correlator() );
+			corrs.push_back( Correlator<QuarkLine>() );
 	}
 
 	op_logger->flush();
@@ -363,17 +363,17 @@ void Manager::load_numerical_results()
 }
 
 
-vector<Trace> Manager::traces_to_compute()
+vector<Trace<QuarkLine>> Manager::traces_to_compute()
 {
 
 	auto main_logger = spdlog::get("main");
   main_logger->info("Organizing traces to compute with none computed");
-	vector<Trace> res;
+	vector<Trace<QuarkLine>> res;
 	for(auto &c: corrs)
 	for(auto &d: c.diags)
 	for(auto &t: d.traces)
 	{
-		Trace r = t;
+		Trace<QuarkLine> r = t;
 		bool found=false;
 		for(size_t i=0; i<r.qls.size(); ++i)
 		{
@@ -388,16 +388,16 @@ vector<Trace> Manager::traces_to_compute()
 	return res;
 }
 
-vector<Trace> Manager::traces_to_compute(const vector<string> computed_names)
+vector<Trace<QuarkLine>> Manager::traces_to_compute(const vector<string> computed_names)
 {
 	auto main_logger = spdlog::get("main");
 	main_logger->info("Organizing traces to compute with some computed");
-	vector<Trace> res;
+	vector<Trace<QuarkLine>> res;
 	for(auto &c: corrs)
 	for(auto &d: c.diags)
 	for(auto &t: d.traces)
 	{
-		Trace r = t;
+		Trace<QuarkLine> r = t;
 		bool found=false;
 		for(size_t i=0; i<r.qls.size(); ++i)
 		{
@@ -416,7 +416,7 @@ vector<Trace> Manager::traces_to_compute(const vector<string> computed_names)
 
 
 
-void Manager::cpu_code_output(ofstream &file, vector<Trace> need_to_compute)
+void Manager::cpu_code_output(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)
 {
 	auto main_logger = spdlog::get("main");
 	main_logger->info("Generating cpp file to compute traces");
@@ -542,14 +542,14 @@ void Manager::cpu_code_output(ofstream &file, vector<Trace> need_to_compute)
 	main_logger->info("CPU code output");
 }
 
-void Manager::diagram_names_output(ofstream &file, vector<Trace> need_to_compute)
+void Manager::diagram_names_output(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)
 {
 	for(const auto &t: need_to_compute)
 		file << t.name() << endl;
 }
 
 
-void Manager::runtime_input_for_cpu(ofstream &file, vector<Trace> need_to_compute)
+void Manager::runtime_input_for_cpu(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)
 {
   vector<string> unique_mom, unique_disp, unique_gamma;
   for(const auto& t : need_to_compute)
@@ -630,7 +630,7 @@ void Manager::shutdown()
 
 
 
-void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace> need_to_compute)
+void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace<QuarkLine>> need_to_compute)
 {
 	auto main_logger = spdlog::get("main");
 	main_logger->info("Generating gpu code to compute traces");

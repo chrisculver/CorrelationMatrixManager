@@ -2,15 +2,11 @@
 
 using namespace std;
 
-bool operator==(const Trace &l, const Trace &r)
-{
-	return l.qls==r.qls;
-}
 
-string Trace::name() const
+template<> string Trace<QuarkLine>::name() const
 {
 	string name;
-	name+="[ ";	
+	name+="[ ";
 	for(size_t i=0; i<qls.size(); ++i)
 	{
 		auto q=qls[i];
@@ -22,11 +18,11 @@ string Trace::name() const
 	}
 	name+="]";
 
-	return name;	
+	return name;
 }
 
 
-vector<string> Trace::compute_name(vector<string> u_mom, vector<string> u_disp, vector<string> u_gamma)
+template<> vector<string> Trace<QuarkLine>::compute_name(vector<string> u_mom, vector<string> u_disp, vector<string> u_gamma)
 {
   ///consider setting print options, then
   ///output for each quark line the string of how the quark line is

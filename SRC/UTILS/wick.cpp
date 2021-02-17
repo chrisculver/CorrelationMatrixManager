@@ -9,7 +9,7 @@
 
 using namespace std;
 
-vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
+template<> vector<Diagram<QuarkLine>> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 {
 	auto wick_logger = spdlog::get("wick");
 
@@ -70,7 +70,7 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 //	}
 	cout << "printed all permutations\n";
 	*/
-	vector<Diagram> res;
+	vector<Diagram<QuarkLine>> res;
 	for(size_t i=0; i<all_barred_permutations.size(); ++i)
 	{
 		auto lst = all_barred_permutations[i];
@@ -82,8 +82,8 @@ vector<Diagram> wick_contract_elems(const ElementalOp &a, const ElementalOp &c)
 
 		if(contractable)
 		{
-			Diagram d;
-			Trace t;
+			Diagram<QuarkLine> d;
+			Trace<QuarkLine> t;
 			vector<bool> q_contracted(unbarred.size(), false);
 			bool all_contracted = false;
 			bool new_trace_loop = false;
