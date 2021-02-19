@@ -17,15 +17,21 @@ class QuarkLine
 		std::string displacement;
 		std::string mom;
 		char ti, tf;
+		std::string fullname;
 
 		QuarkLine(){};
 		QuarkLine(char i, std::string g, std::string d, std::string m, char f):
-			ti(i),gamma(g),displacement(d),mom(m),tf(f){};
+			ti(i),gamma(g),displacement(d),mom(m),tf(f){
+				fullname = gamma+displacement+mom+ti+tf;
+			};
 		QuarkLine(char i, Meson m, char f):
-			ti(i),gamma(m.gamma), displacement(m.displacement), mom(m.mom), tf(f){};
+			ti(i),gamma(m.gamma), displacement(m.displacement), mom(m.mom), tf(f){
+				fullname = gamma+displacement+mom+ti+tf;
+			};
 
 };
 
 bool operator==(const QuarkLine &l, const QuarkLine &r);
+bool operator<(const QuarkLine &l, const QuarkLine &r);
 
 #endif

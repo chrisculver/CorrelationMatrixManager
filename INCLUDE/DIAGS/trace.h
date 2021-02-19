@@ -25,4 +25,13 @@ template<class QL_Type> bool operator==(const Trace<QL_Type> &l, const Trace<QL_
 	return l.qls==r.qls;
 }
 
+/*
+template <class int>
+class Trace
+{
+	public:
+		std::vector<int> qls;
+}
+*/
+
 #endif

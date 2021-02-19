@@ -158,7 +158,8 @@ void Manager::create_logs()
   ///Just doing one extra type of output - debug/verbose
   auto wick_logger = spdlog::basic_logger_mt("wick", "logs/wick_"+cfg_to_string(lat.cfg)+".log");
 	auto op_logger = spdlog::basic_logger_mt("op", "logs/op_"+cfg_to_string(lat.cfg)+".log");
-	wick_logger->set_level(spdlog::level::debug);
+	//wick_logger->set_level(spdlog::level::debug);
+	//spdlog::flush_on(spdlog::level::debug);
 }
 
 void Manager::load_operators()

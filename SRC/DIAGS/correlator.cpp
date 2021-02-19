@@ -8,19 +8,19 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-#include <map>
+#include <unordered_map>
 
 using namespace std;
 using Saved_Diagrams = map<string, map<string,complex<double>>>;
-
-//Correlator<QuarkLine>;
 
 template<> void Correlator<QuarkLine>::wick_contract()
 {
 	auto wick_logger = spdlog::get("wick");
 
-	vector<Diagram<QuarkLine>> new_diags;
-
+	vector<Diagram<int>> all_short_diags;
+	int ql_idx=0;
+	map<int, QuarkLine> int_to_QL;
+	map<QuarkLine, int> QL_to_int;
 
 	for(const auto &c_e: c.terms)
 	for(const auto &a_e: a.terms)
@@ -29,13 +29,53 @@ template<> void Correlator<QuarkLine>::wick_contract()
 												to_string(&c_e - &c.terms[0])+
 												to_string(&a_e - &a.terms[0]));
 
-		new_diags=wick_contract_elems<QuarkLine>(c_e, a_e);
+		auto new_diags=wick_contract_elems<QuarkLine>(c_e, a_e);
+		std::vector<Diagram<int>> short_diags;
+		for(const auto &d: new_diags)
+		{
+			std::vector<Trace<int>> short_vt;
+			for(const auto &t: d.traces)
+			{
+				std::vector<int> short_vql;
+				for(const auto &ql: t.qls)
+				{
+					//cout << "diagram " << to_string(&d - &new_diags[0]) << endl;
+					//cout << ql.gamma << ql.displacement << ql.ti << ql.tf << ql.mom << endl;
+					//cout << (ql.gamma < int_to_QL[0].gamma) << endl;
+					//cout << (ql < int_to_QL[0]) << endl;
+					//cout << (QL_to_int.find(ql)!=QL_to_int.end()) << endl;
+					if(QL_to_int.find(ql)!=QL_to_int.end())
+					{
+						short_vql.push_back( QL_to_int[ql] );
+					}
+					else
+					{
+						//cout << "Doing the things I've done a bunch before" << endl;
+						//QL_to_int[ql]=ql_idx;
+						QL_to_int.insert( std::pair<QuarkLine, int>(ql, ql_idx) );
+						//cout << "Added to QL_to_int" << endl;
+						//int_to_QL[ql_idx]=ql;
+						int_to_QL.insert( std::pair<int, QuarkLine>(ql_idx, ql) );
+						//cout << "Added to int_to_QL" << endl;
+						short_vql.push_back(ql_idx);
+						//cout << "pushing to short_vql" << endl;
+						ql_idx++;
+					}
+				//	cout << "through if/else" << endl;
+				}
+				Trace<int> tshort;
+				tshort.qls = short_vql;
+				short_vt.push_back( tshort );
+			}
+			short_diags.push_back(Diagram<int>(d.coef,short_vt));
+		}
 
-		wick_logger->debug("Done with elemental, adding to diags");
+
+		wick_logger->debug("Done with elemental, adding {:d} short_diags to all_short_diags", short_diags.size());
 		///push some diags into diags
 		///not duplicating elements
 
-		for(const auto &d: new_diags)
+		for(const auto &d: short_diags)
 		{
 			auto equivalent_diags = d.all_cyclic_related_diagrams();
 			int same_diagram=-1;
@@ -44,15 +84,15 @@ template<> void Correlator<QuarkLine>::wick_contract()
 			{
 				if(!found)
 				{
-					for(size_t e=0; e<diags.size(); ++e)
+					for(size_t e=0; e<all_short_diags.size(); ++e)
 					{
-						if( (equivalent_diags[t]==(diags[e].traces)) && !found)
+						if( (equivalent_diags[t]==(all_short_diags[e].traces)) && !found)
 						{
 							found=true;
-							diags[e].coef+=d.coef;
+							all_short_diags[e].coef+=d.coef;
 							///try to keep the list small...
-							if(diags[e].coef==0)
-								diags.erase( diags.begin() + e );
+							if(all_short_diags[e].coef==0)
+								all_short_diags.erase( all_short_diags.begin() + e );
 							break;
 						}
 					}
@@ -61,16 +101,35 @@ template<> void Correlator<QuarkLine>::wick_contract()
 					break;
 			}
 			if(!found)
-				diags.push_back(d);
+				all_short_diags.push_back(d);
 
 		}
-		wick_logger->debug("done adding new_diags");
-	}
+		wick_logger->debug("done adding new_diags, {:d} short_diags", all_short_diags.size());
+	}///done looping through elementals
+
+	//cout << "done with elementals" << endl;
 
 	///double check for zero diags
-	for(auto it = diags.begin(); it != diags.end(); it++)
+	for(auto it = all_short_diags.begin(); it != all_short_diags.end(); it++)
 		if( (*it).coef == 0)
-			diags.erase(it--);
+			all_short_diags.erase(it--);
+
+	for(const auto &sd: all_short_diags)
+	{
+		vector<Trace<QuarkLine>> trs;
+		for(const auto &st: sd.traces)
+		{
+			vector<QuarkLine> qls;
+			for(const auto &sql: st.qls)
+			{
+				qls.push_back(int_to_QL[sql]);
+			}
+			Trace<QuarkLine> t;
+			t.qls=qls;
+			trs.push_back(t);
+		}
+		diags.push_back(Diagram<QuarkLine>(sd.coef, trs));
+	}
 }
 
 template <> void Correlator<QuarkLine>::load_wick_contractions(const std::string filename, const int i, const int j)

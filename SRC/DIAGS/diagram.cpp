@@ -28,22 +28,24 @@ template <> std::string Diagram<QuarkLine>::name() const
 	return name;
 }
 
-
-template <> vector<vector<Trace<QuarkLine>>> Diagram<QuarkLine>::all_cyclic_related_diagrams() const
+/*
+template <class QL> vector<vector<Trace<QL>>> Diagram<QL>::all_cyclic_related_diagrams() const
 {
 	///This finds ALL diagrams that are related by cyclic permutations.
 	/// [ A B ] [ C D ]
 	/// First we make all permutations of the traces, i.e.
-	/// { [ A B ] [ C D ] , [ C D ] [ B A ]}
-	/// For each of these lists find
+	/// { [ A B ] [ C D ] , [ C D ] [ A B ]}
+	/// For each of these lists we also need to permute each element w/in the trace
+	/// { [ A B ] [ C D ] , [ B A ] [C D ], ...   }
 
 	///the vector of traces the algorithm starts at
 	auto start = traces;
-	vector<vector<vector<Trace<QuarkLine>>>> tmp(start.size()+1);
+	vector<vector<vector<Trace<QL>>>> tmp(start.size()+1);
 
+	///all orders of the traces.
 	heaps_algorithm(tmp[0], start, start.size());
-
-
+	///for each order of traces, cyclic rotate each trace's elements getting
+	///all permutations.
 	for(size_t i=0; i<start.size(); ++i)
 	{
 
@@ -58,3 +60,4 @@ template <> vector<vector<Trace<QuarkLine>>> Diagram<QuarkLine>::all_cyclic_rela
 
 	return tmp[start.size()];
 }
+*/

@@ -32,6 +32,7 @@ class Correlator
 		void load_numerical_results(Saved_Traces computed);
 
 		void compute_time_average_correlators();
+
 };
 
 #endif
