@@ -28,6 +28,45 @@ template <> std::string Diagram<QuarkLine>::name() const
 	return name;
 }
 
+template <> std::string Diagram<int>::name() const
+{
+	std::string name(to_string(coef));
+	for(const auto &t: traces)
+	{
+		name+="[ ";
+		for(size_t i=0; i<t.qls.size(); ++i)
+		{
+			auto q=t.qls[i];
+			name+=to_string(q);
+			if(i!=t.qls.size()-1)
+				name+=" | ";
+			else
+				name+=" ";
+		}
+		name+="]";
+	}
+
+	return name;
+}
+
+
+template <> void Diagram<int>::order_traces()
+{
+	for(auto &t: traces)
+	{
+		auto start = t.qls;
+		vector<vector<int>> t_perms;
+		for(size_t i=0; i<start.size(); ++i)
+		{
+			rotate(start.begin(), start.begin()+1, start.end());
+			t_perms.push_back(start);
+		}
+		sort(t_perms.begin(), t_perms.end());
+		t.qls = t_perms[0];
+	}
+	sort(traces.begin(), traces.end());
+}
+
 /*
 template <class QL> vector<vector<Trace<QL>>> Diagram<QL>::all_cyclic_related_diagrams() const
 {

@@ -20,6 +20,11 @@ class Trace
 		std::vector<std::string> compute_name(std::vector<std::string> u_mom, std::vector<std::string> u_disp, std::vector<std::string> u_gamma);
 };
 
+template<class QL_Type> bool operator<(const Trace<QL_Type> &l, const Trace<QL_Type> &r)
+{
+	return l.qls < r.qls;
+}
+
 template<class QL_Type> bool operator==(const Trace<QL_Type> &l, const Trace<QL_Type> &r)
 {
 	return l.qls==r.qls;

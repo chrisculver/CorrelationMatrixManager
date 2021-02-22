@@ -5,20 +5,23 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 template <class QL_Type>
  class Diagram
 {
 	public:
 		std::vector<Trace<QL_Type>> traces;
-		int coef;
+		mutable int coef;
 
 	Diagram(){coef=0;};
 	Diagram(int c, std::vector<Trace<QL_Type>> t):coef(c), traces(t){};
 
 	std::string name() const;
 
-	std::vector<std::vector<Trace<QL_Type>>> all_cyclic_related_diagrams() const
+  void order_traces();
+
+	std::vector<std::vector<Trace<QL_Type>>> all_cyclic_related_trace_products() const
   {
   	///This finds ALL diagrams that are related by cyclic permutations.
   	/// [ A B ] [ C D ]
@@ -26,6 +29,8 @@ template <class QL_Type>
   	/// { [ A B ] [ C D ] , [ C D ] [ A B ]}
   	/// For each of these lists we also need to permute each element w/in the trace
   	/// { [ A B ] [ C D ] , [ B A ] [C D ], ...   }
+    /// [ 1 1 ] [ 1 2 ] ,   [ 1 2 ] [ 3 4 ]
+    /// [ 1 3 2 ] , [ 1 2 3 ]
 
   	///the vector of traces the algorithm starts at
   	auto start = traces;
@@ -49,7 +54,12 @@ template <class QL_Type>
 
   	return tmp[start.size()];
   }
+
 };
 
+template<class QL_Type> bool operator<(const Diagram<QL_Type> &l, const Diagram<QL_Type> &r)
+{
+	return l.traces < r.traces;
+}
 
 #endif

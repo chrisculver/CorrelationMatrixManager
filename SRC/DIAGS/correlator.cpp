@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <set>
 #include <algorithm>
 #include <unordered_map>
 
@@ -17,7 +18,7 @@ template<> void Correlator<QuarkLine>::wick_contract()
 {
 	auto wick_logger = spdlog::get("wick");
 
-	vector<Diagram<int>> all_short_diags;
+	set<Diagram<int>> all_short_diags;
 	int ql_idx=0;
 	map<int, QuarkLine> int_to_QL;
 	map<QuarkLine, int> QL_to_int;
@@ -50,19 +51,14 @@ template<> void Correlator<QuarkLine>::wick_contract()
 					}
 					else
 					{
-						//cout << "Doing the things I've done a bunch before" << endl;
-						//QL_to_int[ql]=ql_idx;
 						QL_to_int.insert( std::pair<QuarkLine, int>(ql, ql_idx) );
-						//cout << "Added to QL_to_int" << endl;
-						//int_to_QL[ql_idx]=ql;
 						int_to_QL.insert( std::pair<int, QuarkLine>(ql_idx, ql) );
-						//cout << "Added to int_to_QL" << endl;
+
 						short_vql.push_back(ql_idx);
-						//cout << "pushing to short_vql" << endl;
 						ql_idx++;
 					}
-				//	cout << "through if/else" << endl;
 				}
+
 				Trace<int> tshort;
 				tshort.qls = short_vql;
 				short_vt.push_back( tshort );
@@ -70,38 +66,42 @@ template<> void Correlator<QuarkLine>::wick_contract()
 			short_diags.push_back(Diagram<int>(d.coef,short_vt));
 		}
 
+		for(auto &d : short_diags)
+		{
+//			auto all_perms = d.all_cyclic_related_trace_products();
+//			sort(all_perms.begin(), all_perms.end());
+
+//			d.traces = all_perms[0];
+
+//			auto tst = d;
+			d.order_traces();
+		}
 
 		wick_logger->debug("Done with elemental, adding {:d} short_diags to all_short_diags", short_diags.size());
 		///push some diags into diags
 		///not duplicating elements
 
+		/// LLoop through new diags created by elemental_i elemental_j
 		for(const auto &d: short_diags)
 		{
-			auto equivalent_diags = d.all_cyclic_related_diagrams();
+//			auto equivalent_diags = d.all_cyclic_related_trace_products();
 			int same_diagram=-1;
 			bool found=false;
-			for(size_t t=0; t<equivalent_diags.size(); ++t)
+//			while(!found)
+//			{
+
+		///make all_short_diags an ordered list, and insert elements correctly,
+		///using std::find or something.
+			auto search_result = all_short_diags.find(d);
+
+			if(search_result != all_short_diags.end())
 			{
-				if(!found)
-				{
-					for(size_t e=0; e<all_short_diags.size(); ++e)
-					{
-						if( (equivalent_diags[t]==(all_short_diags[e].traces)) && !found)
-						{
-							found=true;
-							all_short_diags[e].coef+=d.coef;
-							///try to keep the list small...
-							if(all_short_diags[e].coef==0)
-								all_short_diags.erase( all_short_diags.begin() + e );
-							break;
-						}
-					}
-				}
-				else
-					break;
+				search_result->coef = search_result->coef + d.coef;
+				if(search_result->coef==0)
+					all_short_diags.erase(search_result);
 			}
-			if(!found)
-				all_short_diags.push_back(d);
+			else
+				all_short_diags.insert(d);
 
 		}
 		wick_logger->debug("done adding new_diags, {:d} short_diags", all_short_diags.size());
