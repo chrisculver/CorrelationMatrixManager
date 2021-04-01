@@ -26,9 +26,9 @@ template<> void Correlator<QuarkLine>::wick_contract()
 	for(const auto &c_e: c.terms)
 	for(const auto &a_e: a.terms)
 	{
-		wick_logger->debug("Doing elemental_"+
-												to_string(&c_e - &c.terms[0])+
-												to_string(&a_e - &a.terms[0]));
+//		wick_logger->debug("Doing elemental_"+
+//												to_string(&c_e - &c.terms[0])+
+//												to_string(&a_e - &a.terms[0]));
 
 		auto new_diags=wick_contract_elems<QuarkLine>(c_e, a_e);
 		std::vector<Diagram<int>> short_diags;
@@ -77,7 +77,7 @@ template<> void Correlator<QuarkLine>::wick_contract()
 			d.order_traces();
 		}
 
-		wick_logger->debug("Done with elemental, adding {:d} short_diags to all_short_diags", short_diags.size());
+//		wick_logger->debug("Done with elemental, adding {:d} short_diags to all_short_diags", short_diags.size());
 		///push some diags into diags
 		///not duplicating elements
 
@@ -104,7 +104,7 @@ template<> void Correlator<QuarkLine>::wick_contract()
 				all_short_diags.insert(d);
 
 		}
-		wick_logger->debug("done adding new_diags, {:d} short_diags", all_short_diags.size());
+//		wick_logger->debug("done adding new_diags, {:d} short_diags", all_short_diags.size());
 	}///done looping through elementals
 
 	//cout << "done with elementals" << endl;

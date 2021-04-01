@@ -201,13 +201,13 @@ void Manager::load_operators()
   op_file.close();
 
 
-	main_logger->info("Finished loading the following operators");
+	op_logger->info("Finished loading the following operators");
 	for(size_t i=0; i<ops.size(); ++i)
-		main_logger->info("Operator {} = {}", i, ops[i]);
+		op_logger->info("Operator {} = {}", i, ops[i]);
 
-	main_logger->info("The adjoint operators are");
+	op_logger->info("The adjoint operators are");
 	for(size_t i=0; i<ops.size(); ++i)
-		main_logger->info("Adjoint operator {} = {}", i, adjoint(ops[i]));
+		op_logger->info("Adjoint operator {} = {}", i, adjoint(ops[i]));
 
 //	for(const auto &c : ops)
 //		for(const auto &a : ops)
