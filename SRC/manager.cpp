@@ -158,7 +158,7 @@ void Manager::create_logs()
   ///Just doing one extra type of output - debug/verbose
   auto wick_logger = spdlog::basic_logger_mt("wick", "logs/wick_"+cfg_to_string(lat.cfg)+".log");
 	auto op_logger = spdlog::basic_logger_mt("op", "logs/op_"+cfg_to_string(lat.cfg)+".log");
-	wick_logger->set_level(spdlog::level::debug);
+	wick_logger->set_level(spdlog::level::info);
 	//spdlog::flush_on(spdlog::level::debug);
 }
 
@@ -422,6 +422,7 @@ void Manager::cpu_code_output(ofstream &file, vector<Trace<QuarkLine>> need_to_c
 	auto main_logger = spdlog::get("main");
 	main_logger->info("Generating cpp file to compute traces");
   file << cpp_prefix();
+
   ///The important bit, depends on diagrams!
   vector<string> unique_mom, unique_disp, unique_gamma;
   for(const auto& t : need_to_compute)
@@ -442,8 +443,9 @@ void Manager::cpu_code_output(ofstream &file, vector<Trace<QuarkLine>> need_to_c
   ///collect diagrams of certain lengths 1,2,3,4,5,6,etc and save their strings
   vector<int> idx_track(max_size,0);///tracks idx for each length
   vector<int> res_idx;///for the result to pull the correct trace
-  vector<vector<Trace_Code_Data>> traces_by_size(max_size);
-  //for(auto t : tr)
+  vector<vector<Trace_Code_Data>> traces_by_size(max_size);///first vector contains traces of a different size, second vector all traces
+
+	///Reorganize the list of traces into traces_by_size.
   for(size_t i=0; i<need_to_compute.size(); ++i)
   {
     auto t_size = need_to_compute[i].qls.size()-1;
@@ -453,9 +455,8 @@ void Manager::cpu_code_output(ofstream &file, vector<Trace<QuarkLine>> need_to_c
     res_idx.push_back(idx_track[t_size]);
     idx_track[t_size]++;
   }
-  ///traces_by_size
 
-
+	///Results of the calculation go here
   for(size_t l=0; l<traces_by_size.size(); ++l)
     if(traces_by_size[l].size()>0)
       file << "std::vector<mat> res" << l+1 << "(" << traces_by_size[l].size()
@@ -480,7 +481,7 @@ void Manager::cpu_code_output(ofstream &file, vector<Trace<QuarkLine>> need_to_c
         }
         file << endl;
       }
-    }
+    }///end l<2
     else
     {
       for(size_t d=0; d<trs.size(); ++d)
@@ -488,7 +489,7 @@ void Manager::cpu_code_output(ofstream &file, vector<Trace<QuarkLine>> need_to_c
         file << "res" << l+1 << "[" << d << "]=";
 
         vector<string> computation = trs[d].compute_name;
-        bool max_cse=false;
+        bool max_cse=false;  	///if only two mults are left, we can stop
         ///Do a lookup to see if it's possible to substitute something that has
         ///already been computed.  I want to check for the longest list of
         ///mults down to mults of length 2.
@@ -512,13 +513,14 @@ void Manager::cpu_code_output(ofstream &file, vector<Trace<QuarkLine>> need_to_c
               trs[d].compute_name = computation;
               if(trs[d].compute_name.size()==2)
                 max_cse=true;
-            }
+            }///end if
             if(max_cse)
               break;
-          }
+          }///end i loop
           if(max_cse)
             break;
-        }
+        }///end chk loop
+
         ///now just output the new expression
         for(size_t i=0; i<trs[d].compute_name.size(); ++i)
         {
@@ -534,6 +536,7 @@ void Manager::cpu_code_output(ofstream &file, vector<Trace<QuarkLine>> need_to_c
     }
   }
 
+	///Now every elem of res holds a matrix that needs to be traced over.
   for(size_t d=0; d<need_to_compute.size(); ++d)
     for(size_t l=0; l<traces_by_size.size(); ++l)
       if(need_to_compute[d].qls.size()==(l+1))
