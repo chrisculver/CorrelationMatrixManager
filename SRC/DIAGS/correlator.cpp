@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 using namespace std;
-using Saved_Diagrams = map<string, map<string,complex<double>>>;
+using Saved_Diagrams = map<string, vector<vector<complex<double>>>>;
 
 template<> void Correlator<QuarkLine>::wick_contract()
 {
@@ -177,14 +177,21 @@ template <> void Correlator<QuarkLine>::load_wick_contractions(const std::string
 	in_file.close();
 }
 
-template <> void Correlator<QuarkLine>::load_numerical_results(Saved_Diagrams computed)
+template <> void Correlator<QuarkLine>::load_numerical_results(Saved_Diagrams &computed)
 {
 	for(auto& d : diags)
   {
 		for(auto& t : d.traces)
     {
       if( computed.count(t.name()) > 0 )
+			{
         t.numerical_value = computed[t.name()];
+		//		cout << t.name() << " has size " << computed[t.name()].size() << "," << flush;
+		//		cout << computed[t.name()][0].size() << endl << flush;
+
+		//		cout << "tr has size " << t.numerical_value.size() << "," << flush;
+		//		cout << t.numerical_value[0].size() << endl << flush;
+			}
       else
       {
 				///Search for cyclic permutations of the trace.
@@ -206,32 +213,37 @@ template <> void Correlator<QuarkLine>::load_numerical_results(Saved_Diagrams co
 				if(!found)
           throw 'm';
       }
-			for(const auto &ti : ts)
-				for(const auto &dt : dts)
-					if( t.numerical_value.count(to_string(dt)+" "+to_string(ti)) == 0 )
-						throw 't';
+			//for(const auto &ti : ts)
+			//	for(const auto &dt : dts)
+			//		if( t.numerical_value.count(to_string(dt)+" "+to_string(ti)) == 0 )
+			//			throw 't';
 		}///end of trace loop
+	//	cout << "after trace loop " << d.traces[0].numerical_value.size() << endl << flush;
   }///end of diagram loop
+	//cout << "after diag loop" << diags[0].traces[0].numerical_value.size() << endl << flush;
 }
 
 
 
 template <> void Correlator<QuarkLine>::compute_time_average_correlators()
 {
+//	cout << "made it here!" << endl;
+//	cout << "dts.size() = " << dts.size() << "  ts.size()=" << ts.size() << endl;
   corr_t.resize(dts.size());
-	for(int i=0; i<dts.size(); ++i)
+	for(size_t i=0; i<dts.size(); ++i)
   {
 		int dt = dts[i];
     complex<double> time_avg(0.,0.);
-    for(const auto &t : ts)
+    for(size_t i=0; i<ts.size(); ++i)
     {
+			int t = ts[i];
       for(const auto& d : diags)
       {
         complex<double> trace_product(1.,0.);
-        for(auto tr : d.traces)
+        for(const auto& tr : d.traces)
         {
-          trace_product *= tr.numerical_value[to_string(dt)+" "+to_string(t)];
-        }///end traces
+          trace_product *= tr.numerical_value[dt][t];
+        }///end traces//
         time_avg += complex<double>(d.coef,0)*trace_product;
       }///end diags
     }///end t

@@ -75,7 +75,7 @@ struct Manager
 	void wick_contractions();
 
 	///This function loads the diagrams from a file(s).
-	void load_numerical_results();
+	void load_numerical_results_and_compute_tavg_corr();
 
 	std::vector<Trace<QuarkLine>> traces_to_compute();
 	std::vector<Trace<QuarkLine>> traces_to_compute(const std::vector<std::string> computed_names);

@@ -1,0 +1,74 @@
+DIAGS_TRACE_H	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/trace.h	/^#define DIAGS_TRACE_H$/;"	macro	line:2
+Trace	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/trace.h	/^class Trace$/;"	class	line:12
+qls	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/trace.h	/^		std::vector<QL_Type> qls;$/;"	member	line:15	class:Trace
+numerical_value	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/trace.h	/^		std::vector<std::vector<std::complex<double>>> numerical_value;$/;"	member	line:17	class:Trace
+operator <	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/trace.h	/^template<class QL_Type> bool operator<(const Trace<QL_Type> &l, const Trace<QL_Type> &r)$/;"	function	line:23	signature:(const Trace<QL_Type> &l, const Trace<QL_Type> &r)
+operator ==	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/trace.h	/^template<class QL_Type> bool operator==(const Trace<QL_Type> &l, const Trace<QL_Type> &r)$/;"	function	line:28	signature:(const Trace<QL_Type> &l, const Trace<QL_Type> &r)
+load_diagram_filenames	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/UTILS/file_utilities.cpp	/^vector<string> load_diagram_filenames(string file, string cfg)$/;"	function	line:12	signature:(string file, string cfg)
+file_exists	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/UTILS/file_utilities.cpp	/^bool file_exists(string filename)$/;"	function	line:24	signature:(string filename)
+parse_diagram_file	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/UTILS/file_utilities.cpp	/^void parse_diagram_file(Saved_Diagrams &computed, std::string filename, int NT)$/;"	function	line:30	signature:(Saved_Diagrams &computed, std::string filename, int NT)
+cpp_prefix	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/UTILS/file_utilities.cpp	/^string cpp_prefix()$/;"	function	line:55	signature:()
+cpp_postfix	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/UTILS/file_utilities.cpp	/^string cpp_postfix()$/;"	function	line:68	signature:()
+gpu_code_cpp_prefix	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/UTILS/file_utilities.cpp	/^string gpu_code_cpp_prefix()$/;"	function	line:73	signature:()
+gpu_code_cuda_prefix	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/UTILS/file_utilities.cpp	/^string gpu_code_cuda_prefix()$/;"	function	line:105	signature:()
+gpu_code_function_prefix	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/UTILS/file_utilities.cpp	/^string gpu_code_function_prefix(std::string l, std::string s)$/;"	function	line:114	signature:(std::string l, std::string s)
+gpu_code_function_postfix	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/UTILS/file_utilities.cpp	/^string gpu_code_function_postfix()$/;"	function	line:161	signature:()
+gpu_code_cpp_postfix	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/UTILS/file_utilities.cpp	/^string gpu_code_cpp_postfix()$/;"	function	line:178	signature:()
+FILE_UTILITIES_H	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/UTILS/file_utilities.h	/^#define FILE_UTILITIES_H$/;"	macro	line:2
+DIAGS_CORRELATOR_H	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/correlator.h	/^#define DIAGS_CORRELATOR_H$/;"	macro	line:2
+Correlator	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/correlator.h	/^class Correlator$/;"	class	line:13
+c	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/correlator.h	/^		const Operator c, a;$/;"	member	line:16	class:Correlator
+a	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/correlator.h	/^		const Operator c, a;$/;"	member	line:16	class:Correlator
+diags	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/correlator.h	/^		std::vector<Diagram<QL_Type>> diags;$/;"	member	line:18	class:Correlator
+corr_t	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/correlator.h	/^		std::vector<std::complex<double>> corr_t;$/;"	member	line:20	class:Correlator
+ts	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/correlator.h	/^		std::vector<int> ts, dts;$/;"	member	line:22	class:Correlator
+dts	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/correlator.h	/^		std::vector<int> ts, dts;$/;"	member	line:22	class:Correlator
+Correlator	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/correlator.h	/^		Correlator(){};$/;"	function	line:24	class:Correlator	signature:()
+Correlator	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/DIAGS/correlator.h	/^		Correlator(Operator n_a, Operator c_a,$/;"	function	line:25	class:Correlator	signature:(Operator n_a, Operator c_a, std::vector<int> n_ts, std::vector<int> n_dts)
+MANAGER_H	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^#define MANAGER_H$/;"	macro	line:2
+Lattice	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^struct Lattice$/;"	struct	line:12
+nx	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	int nx,ny,nz,nt,cfg;$/;"	member	line:15	struct:Lattice
+ny	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	int nx,ny,nz,nt,cfg;$/;"	member	line:15	struct:Lattice
+nz	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	int nx,ny,nz,nt,cfg;$/;"	member	line:15	struct:Lattice
+nt	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	int nx,ny,nz,nt,cfg;$/;"	member	line:15	struct:Lattice
+cfg	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	int nx,ny,nz,nt,cfg;$/;"	member	line:15	struct:Lattice
+Lattice	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	Lattice(){nx=0;ny=0;nz=0;nt=0;cfg=0;}$/;"	function	line:17	struct:Lattice	signature:()
+Lattice	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	Lattice(int x, int y, int z, int t, int c):nx(x),ny(y),nz(z),nt(t),cfg(c){};$/;"	function	line:19	struct:Lattice	signature:(int x, int y, int z, int t, int c)
+FileNames	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^struct FileNames$/;"	struct	line:23
+operator_filename	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	std::string operator_filename;$/;"	member	line:26	struct:FileNames
+diagram_files	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	std::vector<std::string> diagram_files;$/;"	member	line:28	struct:FileNames
+FileNames	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	FileNames(){operator_filename="";diagram_files=std::vector<std::string>{};};$/;"	function	line:30	struct:FileNames	signature:()
+FileNames	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	FileNames(std::string o_f, std::vector<std::string> d_fs):operator_filename(o_f),diagram_files(d_fs){};$/;"	function	line:31	struct:FileNames	signature:(std::string o_f, std::vector<std::string> d_fs)
+Trace_Code_Data	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^struct Trace_Code_Data$/;"	struct	line:36
+compute_name	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^  std::vector<std::string> compute_name;$/;"	member	line:38	struct:Trace_Code_Data
+idx	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^  int idx;\/\/\/This may not be used anymore$/;"	member	line:39	struct:Trace_Code_Data
+Trace_Code_Data	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^  Trace_Code_Data(std::vector<std::string> name, int idx):compute_name(name), idx(idx){};$/;"	function	line:41	struct:Trace_Code_Data	signature:(std::vector<std::string> name, int idx)
+Manager	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^struct Manager$/;"	struct	line:46
+verbose_logging	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^  bool verbose_logging;$/;"	member	line:49	struct:Manager
+lat	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	Lattice lat;$/;"	member	line:51	struct:Manager
+files	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	FileNames files;$/;"	member	line:53	struct:Manager
+gpu_memory	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	long int gpu_memory;$/;"	member	line:55	struct:Manager
+dts	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	std::vector<int> dts,ts;$/;"	member	line:57	struct:Manager
+ts	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	std::vector<int> dts,ts;$/;"	member	line:57	struct:Manager
+ops	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	std::vector<Operator> ops;$/;"	member	line:59	struct:Manager
+corrs	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	std::vector<Correlator<QuarkLine>> corrs;$/;"	member	line:61	struct:Manager
+Manager	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/INCLUDE/manager.h	/^	Manager(){};$/;"	function	line:63	struct:Manager	signature:()
+wick_contract	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/DIAGS/correlator.cpp	/^template<> void Correlator<QuarkLine>::wick_contract()$/;"	function	line:17	class:Correlator	signature:()
+load_wick_contractions	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/DIAGS/correlator.cpp	/^template <> void Correlator<QuarkLine>::load_wick_contractions(const std::string filename, const int i, const int j)$/;"	function	line:135	class:Correlator	signature:(const std::string filename, const int i, const int j)
+load_numerical_results	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/DIAGS/correlator.cpp	/^template <> void Correlator<QuarkLine>::load_numerical_results(Saved_Diagrams &computed)$/;"	function	line:180	class:Correlator	signature:(Saved_Diagrams &computed)
+compute_time_average_correlators	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/DIAGS/correlator.cpp	/^template <> void Correlator<QuarkLine>::compute_time_average_correlators()$/;"	function	line:228	class:Correlator	signature:()
+main	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/main.cpp	/^int main(int argc, char **argv)$/;"	function	line:12	signature:(int argc, char **argv)
+load_input	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::load_input(string input_filename)$/;"	function	line:30	class:Manager	signature:(string input_filename)
+create_logs	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::create_logs()$/;"	function	line:151	class:Manager	signature:()
+load_operators	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::load_operators()$/;"	function	line:165	class:Manager	signature:()
+wick_contractions	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::wick_contractions()$/;"	function	line:229	class:Manager	signature:()
+load_numerical_results_and_compute_tavg_corr	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::load_numerical_results_and_compute_tavg_corr()$/;"	function	line:276	class:Manager	signature:()
+compute_time_average_correlators	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::compute_time_average_correlators()$/;"	function	line:387	class:Manager	signature:()
+print_correlators	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::print_correlators()$/;"	function	line:406	class:Manager	signature:()
+shutdown	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::shutdown()$/;"	function	line:418	class:Manager	signature:()
+gpu_code_output	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace<QuarkLine>> need_to_compute)$/;"	function	line:428	class:Manager	signature:(ofstream &cppfile, ofstream &gpufile, vector<Trace<QuarkLine>> need_to_compute)
+traces_to_compute	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^vector<Trace<QuarkLine>> Manager::traces_to_compute()$/;"	function	line:684	class:Manager	signature:()
+traces_to_compute	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^vector<Trace<QuarkLine>> Manager::traces_to_compute(const vector<string> computed_names)$/;"	function	line:709	class:Manager	signature:(const vector<string> computed_names)
+cpu_code_output	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::cpu_code_output(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)$/;"	function	line:737	class:Manager	signature:(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)
+diagram_names_output	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::diagram_names_output(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)$/;"	function	line:866	class:Manager	signature:(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)
+runtime_input_for_cpu	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::runtime_input_for_cpu(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)$/;"	function	line:873	class:Manager	signature:(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)

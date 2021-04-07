@@ -1,0 +1,20 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	0	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+load_input	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::load_input(string input_filename)$/;"	function	line:30	class:Manager	signature:(string input_filename)
+create_logs	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::create_logs()$/;"	function	line:151	class:Manager	signature:()
+load_operators	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::load_operators()$/;"	function	line:165	class:Manager	signature:()
+wick_contractions	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::wick_contractions()$/;"	function	line:229	class:Manager	signature:()
+load_numerical_results_and_compute_tavg_corr	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::load_numerical_results_and_compute_tavg_corr()$/;"	function	line:276	class:Manager	signature:()
+compute_time_average_correlators	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::compute_time_average_correlators()$/;"	function	line:387	class:Manager	signature:()
+print_correlators	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::print_correlators()$/;"	function	line:406	class:Manager	signature:()
+shutdown	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::shutdown()$/;"	function	line:418	class:Manager	signature:()
+gpu_code_output	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::gpu_code_output(ofstream &cppfile, ofstream &gpufile, vector<Trace<QuarkLine>> need_to_compute)$/;"	function	line:428	class:Manager	signature:(ofstream &cppfile, ofstream &gpufile, vector<Trace<QuarkLine>> need_to_compute)
+traces_to_compute	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^vector<Trace<QuarkLine>> Manager::traces_to_compute()$/;"	function	line:684	class:Manager	signature:()
+traces_to_compute	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^vector<Trace<QuarkLine>> Manager::traces_to_compute(const vector<string> computed_names)$/;"	function	line:709	class:Manager	signature:(const vector<string> computed_names)
+cpu_code_output	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::cpu_code_output(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)$/;"	function	line:737	class:Manager	signature:(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)
+diagram_names_output	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::diagram_names_output(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)$/;"	function	line:866	class:Manager	signature:(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)
+runtime_input_for_cpu	/home/chrisculver/Code/LatticeQCD/CorrelationMatrixManager/SRC/manager.cpp	/^void Manager::runtime_input_for_cpu(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)$/;"	function	line:873	class:Manager	signature:(ofstream &file, vector<Trace<QuarkLine>> need_to_compute)

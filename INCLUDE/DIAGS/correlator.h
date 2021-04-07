@@ -28,8 +28,8 @@ class Correlator
 		void wick_contract();
 		void load_wick_contractions(const std::string filename, const int i, const int j);
 
-		using Saved_Traces = std::map<std::string, std::map<std::string,std::complex<double>>>;
-		void load_numerical_results(Saved_Traces computed);
+		using Saved_Traces = std::map<std::string, std::vector<std::vector<std::complex<double>>>>;
+		void load_numerical_results(Saved_Traces &computed);
 
 		void compute_time_average_correlators();
 
