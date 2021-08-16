@@ -6,7 +6,8 @@
 
 using namespace std;
 
-std::string Diagram::name() const
+
+template <> std::string Diagram<QuarkLine>::name() const
 {
 	std::string name(to_string(coef));
 	for(const auto &t: traces)
@@ -27,22 +28,63 @@ std::string Diagram::name() const
 	return name;
 }
 
+template <> std::string Diagram<int>::name() const
+{
+	std::string name(to_string(coef));
+	for(const auto &t: traces)
+	{
+		name+="[ ";
+		for(size_t i=0; i<t.qls.size(); ++i)
+		{
+			auto q=t.qls[i];
+			name+=to_string(q);
+			if(i!=t.qls.size()-1)
+				name+=" | ";
+			else
+				name+=" ";
+		}
+		name+="]";
+	}
 
-vector<vector<Trace>> Diagram::all_cyclic_related_diagrams() const
+	return name;
+}
+
+
+template <> void Diagram<int>::order_traces()
+{
+	for(auto &t: traces)
+	{
+		auto start = t.qls;
+		vector<vector<int>> t_perms;
+		for(size_t i=0; i<start.size(); ++i)
+		{
+			rotate(start.begin(), start.begin()+1, start.end());
+			t_perms.push_back(start);
+		}
+		sort(t_perms.begin(), t_perms.end());
+		t.qls = t_perms[0];
+	}
+	sort(traces.begin(), traces.end());
+}
+
+/*
+template <class QL> vector<vector<Trace<QL>>> Diagram<QL>::all_cyclic_related_diagrams() const
 {
 	///This finds ALL diagrams that are related by cyclic permutations.
 	/// [ A B ] [ C D ]
 	/// First we make all permutations of the traces, i.e.
-	/// { [ A B ] [ C D ] , [ C D ] [ B A ]}
-	/// For each of these lists find
+	/// { [ A B ] [ C D ] , [ C D ] [ A B ]}
+	/// For each of these lists we also need to permute each element w/in the trace
+	/// { [ A B ] [ C D ] , [ B A ] [C D ], ...   }
 
 	///the vector of traces the algorithm starts at
 	auto start = traces;
-	vector<vector<vector<Trace>>> tmp(start.size()+1);
+	vector<vector<vector<Trace<QL>>>> tmp(start.size()+1);
 
+	///all orders of the traces.
 	heaps_algorithm(tmp[0], start, start.size());
-
-
+	///for each order of traces, cyclic rotate each trace's elements getting
+	///all permutations.
 	for(size_t i=0; i<start.size(); ++i)
 	{
 
@@ -57,3 +99,4 @@ vector<vector<Trace>> Diagram::all_cyclic_related_diagrams() const
 
 	return tmp[start.size()];
 }
+*/

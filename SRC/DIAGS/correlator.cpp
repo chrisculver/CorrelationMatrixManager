@@ -1,73 +1,138 @@
 #include "DIAGS/correlator.h"
 #include "UTILS/wick.h"
 #include "UTILS/string_utilities.h"
+#include "DIAGS/quark_line.h"
 
 #include "spdlog/spdlog.h"
 
 #include <iostream>
 #include <fstream>
+#include <set>
 #include <algorithm>
+#include <unordered_map>
 
 using namespace std;
-using Saved_Diagrams = map<string, map<string,complex<double>>>;
+using Saved_Diagrams = map<string, vector<vector<complex<double>>>>;
 
-void Correlator::wick_contract()
+template<> void Correlator<QuarkLine>::wick_contract()
 {
 	auto wick_logger = spdlog::get("wick");
 
-	vector<Diagram> new_diags;
+	set<Diagram<int>> all_short_diags;
+	int ql_idx=0;
+	map<int, QuarkLine> int_to_QL;
+	map<QuarkLine, int> QL_to_int;
+
 	for(const auto &c_e: c.terms)
 	for(const auto &a_e: a.terms)
 	{
-		wick_logger->debug("Doing elemental_"+
-												to_string(&c_e - &c.terms[0])+
-												to_string(&a_e - &a.terms[0]));
+//		wick_logger->debug("Doing elemental_"+
+//												to_string(&c_e - &c.terms[0])+
+//												to_string(&a_e - &a.terms[0]));
 
-		new_diags=wick_contract_elems(c_e, a_e);
+		auto new_diags=wick_contract_elems<QuarkLine>(c_e, a_e);
+		std::vector<Diagram<int>> short_diags;
+		for(const auto &d: new_diags)
+		{
+			std::vector<Trace<int>> short_vt;
+			for(const auto &t: d.traces)
+			{
+				std::vector<int> short_vql;
+				for(const auto &ql: t.qls)
+				{
+					//cout << "diagram " << to_string(&d - &new_diags[0]) << endl;
+					//cout << ql.gamma << ql.displacement << ql.ti << ql.tf << ql.mom << endl;
+					//cout << (ql.gamma < int_to_QL[0].gamma) << endl;
+					//cout << (ql < int_to_QL[0]) << endl;
+					//cout << (QL_to_int.find(ql)!=QL_to_int.end()) << endl;
+					if(QL_to_int.find(ql)!=QL_to_int.end())
+					{
+						short_vql.push_back( QL_to_int[ql] );
+					}
+					else
+					{
+						QL_to_int.insert( std::pair<QuarkLine, int>(ql, ql_idx) );
+						int_to_QL.insert( std::pair<int, QuarkLine>(ql_idx, ql) );
 
-		wick_logger->debug("Done with elemental, adding to diags");
+						short_vql.push_back(ql_idx);
+						ql_idx++;
+					}
+				}
+
+				Trace<int> tshort;
+				tshort.qls = short_vql;
+				short_vt.push_back( tshort );
+			}
+			short_diags.push_back(Diagram<int>(d.coef,short_vt));
+		}
+
+		for(auto &d : short_diags)
+		{
+//			auto all_perms = d.all_cyclic_related_trace_products();
+//			sort(all_perms.begin(), all_perms.end());
+
+//			d.traces = all_perms[0];
+
+//			auto tst = d;
+			d.order_traces();
+		}
+
+//		wick_logger->debug("Done with elemental, adding {:d} short_diags to all_short_diags", short_diags.size());
 		///push some diags into diags
 		///not duplicating elements
 
-		for(const auto &d: new_diags)
+		/// LLoop through new diags created by elemental_i elemental_j
+		for(const auto &d: short_diags)
 		{
-			auto equivalent_diags = d.all_cyclic_related_diagrams();
+//			auto equivalent_diags = d.all_cyclic_related_trace_products();
 			int same_diagram=-1;
 			bool found=false;
-			for(size_t t=0; t<equivalent_diags.size(); ++t)
+//			while(!found)
+//			{
+
+		///make all_short_diags an ordered list, and insert elements correctly,
+		///using std::find or something.
+			auto search_result = all_short_diags.find(d);
+
+			if(search_result != all_short_diags.end())
 			{
-				if(!found)
-				{
-					for(size_t e=0; e<diags.size(); ++e)
-					{
-						if( (equivalent_diags[t]==(diags[e].traces)) && !found)
-						{
-							found=true;
-							diags[e].coef+=d.coef;
-							///try to keep the list small...
-							if(diags[e].coef==0)
-								diags.erase( diags.begin() + e );
-							break;
-						}
-					}
-				}
-				else
-					break;
+				search_result->coef = search_result->coef + d.coef;
+				if(search_result->coef==0)
+					all_short_diags.erase(search_result);
 			}
-			if(!found)
-				diags.push_back(d);
+			else
+				all_short_diags.insert(d);
 
 		}
-		wick_logger->debug("done adding new_diags");
-	}
+//		wick_logger->debug("done adding new_diags, {:d} short_diags", all_short_diags.size());
+	}///done looping through elementals
+
+	//cout << "done with elementals" << endl;
 
 	///double check for zero diags
-	for(auto it = diags.begin(); it != diags.end(); it++)
+	for(auto it = all_short_diags.begin(); it != all_short_diags.end(); it++)
 		if( (*it).coef == 0)
-			diags.erase(it--);
+			all_short_diags.erase(it--);
+
+	for(const auto &sd: all_short_diags)
+	{
+		vector<Trace<QuarkLine>> trs;
+		for(const auto &st: sd.traces)
+		{
+			vector<QuarkLine> qls;
+			for(const auto &sql: st.qls)
+			{
+				qls.push_back(int_to_QL[sql]);
+			}
+			Trace<QuarkLine> t;
+			t.qls=qls;
+			trs.push_back(t);
+		}
+		diags.push_back(Diagram<QuarkLine>(sd.coef, trs));
+	}
 }
 
-void Correlator::load_wick_contractions(const std::string filename, const int i, const int j)
+template <> void Correlator<QuarkLine>::load_wick_contractions(const std::string filename, const int i, const int j)
 {
 	ifstream in_file(filename);
 
@@ -81,12 +146,12 @@ void Correlator::load_wick_contractions(const std::string filename, const int i,
 			vector<string> diag_text = split(equals_split[1],'+');
 			for(auto &term : diag_text)
 			{
-				Diagram d;
+				Diagram<QuarkLine> d;
 				vector<string> trs_text = split(term,'[');
 				d.coef = stoi(trs_text[0]);
 				for(size_t i=1; i<trs_text.size(); ++i)
 				{
-					Trace t;
+					Trace<QuarkLine> t;
 					vector<string> qls_text = split(trs_text[i],'|');
 					for(size_t j=0; j<qls_text.size(); ++j)
 					{
@@ -112,18 +177,25 @@ void Correlator::load_wick_contractions(const std::string filename, const int i,
 	in_file.close();
 }
 
-void Correlator::load_numerical_results(Saved_Diagrams computed)
+template <> void Correlator<QuarkLine>::load_numerical_results(Saved_Diagrams &computed)
 {
 	for(auto& d : diags)
   {
 		for(auto& t : d.traces)
     {
       if( computed.count(t.name()) > 0 )
+			{
         t.numerical_value = computed[t.name()];
+		//		cout << t.name() << " has size " << computed[t.name()].size() << "," << flush;
+		//		cout << computed[t.name()][0].size() << endl << flush;
+
+		//		cout << "tr has size " << t.numerical_value.size() << "," << flush;
+		//		cout << t.numerical_value[0].size() << endl << flush;
+			}
       else
       {
 				///Search for cyclic permutations of the trace.
-				Trace r = t;
+				Trace<QuarkLine> r = t;
 				bool found = false;
 
 				///TODO is this one extra permutation then necessary?
@@ -141,32 +213,37 @@ void Correlator::load_numerical_results(Saved_Diagrams computed)
 				if(!found)
           throw 'm';
       }
-			for(const auto &ti : ts)
-				for(const auto &dt : dts)
-					if( t.numerical_value.count(to_string(dt)+" "+to_string(ti)) == 0 )
-						throw 't';
+			//for(const auto &ti : ts)
+			//	for(const auto &dt : dts)
+			//		if( t.numerical_value.count(to_string(dt)+" "+to_string(ti)) == 0 )
+			//			throw 't';
 		}///end of trace loop
+	//	cout << "after trace loop " << d.traces[0].numerical_value.size() << endl << flush;
   }///end of diagram loop
+	//cout << "after diag loop" << diags[0].traces[0].numerical_value.size() << endl << flush;
 }
 
 
 
-void Correlator::compute_time_average_correlators()
+template <> void Correlator<QuarkLine>::compute_time_average_correlators()
 {
+//	cout << "made it here!" << endl;
+//	cout << "dts.size() = " << dts.size() << "  ts.size()=" << ts.size() << endl;
   corr_t.resize(dts.size());
-	for(int i=0; i<dts.size(); ++i)
+	for(size_t i=0; i<dts.size(); ++i)
   {
 		int dt = dts[i];
     complex<double> time_avg(0.,0.);
-    for(const auto &t : ts)
+    for(size_t i=0; i<ts.size(); ++i)
     {
+			int t = ts[i];
       for(const auto& d : diags)
       {
         complex<double> trace_product(1.,0.);
-        for(auto tr : d.traces)
+        for(const auto& tr : d.traces)
         {
-          trace_product *= tr.numerical_value[to_string(dt)+" "+to_string(t)];
-        }///end traces
+          trace_product *= tr.numerical_value[dt][t];
+        }///end traces//
         time_avg += complex<double>(d.coef,0)*trace_product;
       }///end diags
     }///end t

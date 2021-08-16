@@ -3,7 +3,7 @@
 #include "UTILS/string_utilities.h"
 
 #include <iostream>
-#include <fstream> 	
+#include <fstream>
 #include <string>
 #include <map>
 
@@ -48,16 +48,20 @@ int main(int argc, char **argv)
 
 	run.wick_contractions();
 
-	try
+  try
 	{
 		///TODO: Currently all diagrams in one file, goes through the list
 		//sequentially, load's alot of data into memory, and searches a large map.
 		///Could create some clever system to look in different files corresponding
 		///to the length of the diagram and load all those traces, then next size, etc.
-		run.load_numerical_results();
+		run.load_numerical_results_and_compute_tavg_corr();
 	}
-	catch(vector<Trace> need_to_compute)
+	catch(vector<Trace<QuarkLine>> need_to_compute)
 	{
+		cout << "CRITICAL ERROR: Missing diagrams or values at certain times!\n";
+		cout << "Printing list of diagrams that are missing\n";
+		cout << "TODO: Also print for which times the values are missing\n";
+
 		ofstream cpu_code("define_diagrams.cpp");
 		run.cpu_code_output(cpu_code, need_to_compute);
 		cpu_code.close();
@@ -83,6 +87,7 @@ int main(int argc, char **argv)
 	run.compute_time_average_correlators();
 
 	run.print_correlators();
+
 
 	run.shutdown();
 

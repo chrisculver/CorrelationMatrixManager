@@ -11,7 +11,8 @@ std::vector<std::string> load_diagram_filenames(std::string file, std::string cf
 
 bool file_exists(std::string filename);
 
-std::map<std::string, std::map<std::string,std::complex<double>>> parse_diagram_file(std::string filename);
+void parse_diagram_file(std::map< std::string, std::vector<std::vector<std::complex<double>>>> &computed,
+                        std::string filename, int NT);
 
 std::string cpp_prefix();
 std::string cpp_postfix();

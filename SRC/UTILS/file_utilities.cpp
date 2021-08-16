@@ -3,9 +3,11 @@
 #include "manager.h"
 
 #include <fstream>
+#include <string>
+#include <iostream>
 
 using namespace std;
-using Saved_Diagrams = map<string, map<string,complex<double>>>;
+using Saved_Diagrams = map<string, vector<vector<complex<double>>>>;
 
 vector<string> load_diagram_filenames(string file, string cfg)
 {
@@ -25,31 +27,29 @@ bool file_exists(string filename)
   return file.good();
 }
 
-Saved_Diagrams parse_diagram_file(std::string filename)
+void parse_diagram_file(Saved_Diagrams &computed, std::string filename, int NT)
 {
 	ifstream input(filename);
   string line;
   string current_diagram;
-  Saved_Diagrams res;
 
   while(getline(input, line))
   {
     if(line[0]=='[')
+    {
       current_diagram=line;
+      vector<vector<complex<double>>> diagram_values(NT, vector<complex<double>>(NT, 0.));
+      computed[current_diagram] = diagram_values;
+    }
     else
     {
       auto columns = split(line, ' ');
-      res[current_diagram][columns[0]+" "+columns[1]]=std::complex<double>{stod(columns[2]), stod(columns[3])};
+      auto value = std::complex<double>{stod(columns[2]), stod(columns[3])};
+      computed[current_diagram][stoi(columns[0])][stoi(columns[1])]=value;
+
     }
   }
   input.close();
-
-//  Saved_Traces computed_traces;
-//  for(size_t i=0; i<all_names.size(); ++i)
-//    computed_traces[all_names[i]] = all_values[i];
-
-  return res;
-
 }
 
 string cpp_prefix()
