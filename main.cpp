@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 
 	run.wick_contractions();
 
-	try
+  try
 	{
 		///TODO: Currently all diagrams in one file, goes through the list
 		//sequentially, load's alot of data into memory, and searches a large map.
@@ -84,9 +84,10 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	//run.compute_time_average_correlators();
+	run.compute_time_average_correlators();
 
 	run.print_correlators();
+
 
 	run.shutdown();
 
