@@ -3,13 +3,13 @@ project("Correlation Matrix Manager")
 
 SET(GCC_COMPILE_FLAGS "-std=c++17 -O3")
 
-include_directories(INCLUDE $ENV{HOME}/Code/Libraries/spdlog/include/)
+include_directories(INCLUDE $ENV{HOME}/libs/spdlog/include/)
 file(GLOB SOURCES "SRC/*.cpp" "SRC/UTILS/*.cpp" "SRC/OPS/*.cpp" "SRC/DIAGS/*.cpp" main.cpp)
 
 add_executable(compute_correlation_matrix ${SOURCES})
 
 #include GWU-QCD library
-find_library(SPDLOG libspdlog.a $ENV{HOME}/Code/Libraries/spdlog/build/)
+find_library(SPDLOG libspdlog.a $ENV{HOME}/libs/spdlog/build/)
 target_link_libraries(compute_correlation_matrix ${SPDLOG})
 
 
