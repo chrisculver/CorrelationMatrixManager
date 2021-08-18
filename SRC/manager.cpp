@@ -186,7 +186,7 @@ void Manager::load_operators()
     for(const auto term:op_sum)
     {
       auto meson_text = split(term, '|');
-			int coef = stoi(meson_text[0]);
+			double coef = stod(meson_text[0]);
 			meson_text.erase(meson_text.begin(), meson_text.begin()+1);
       vector<Meson> ms;
       for(const auto meson:meson_text)

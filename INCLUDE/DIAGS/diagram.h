@@ -12,7 +12,7 @@ template <class QL_Type>
 {
 	public:
 		std::vector<Trace<QL_Type>> traces;
-		mutable int coef;
+		mutable double coef;
 
 	Diagram(){coef=0;};
 	Diagram(int c, std::vector<Trace<QL_Type>> t):coef(c), traces(t){};
