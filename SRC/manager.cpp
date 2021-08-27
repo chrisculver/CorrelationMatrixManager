@@ -354,6 +354,7 @@ void Manager::load_numerical_results_and_compute_tavg_corr()
 			catch(char missing)
 			{
 				main_logger->info("load_numerical_results threw {}", missing);
+        main_logger->flush();
 				if(missing == 't')
 				{
 					std::cout << "WARNING: OUTPUTTING ALL TRACES - NO LOOKUP";
