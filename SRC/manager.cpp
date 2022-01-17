@@ -884,27 +884,21 @@ void Manager::runtime_input_for_cpu(ofstream &file, vector<Trace<QuarkLine>> nee
         unique_gamma.push_back(q.gamma);
     }
 
-  file << "nx " << lat.nx << endl;
-  file << "ny " << lat.ny << endl;
-  file << "nz " << lat.nz << endl;
-  file << "nt " << lat.nt << endl;
-  file << "nvec 10" << endl;
-  file << "cfg 100" << endl;
-	file << "latname CFG/c44_b5.3_k0.158_100" << endl;
-  file << "ndiags " << need_to_compute.size() << endl;
-  file << "unique_mom:length " << unique_mom.size() << endl;
-  for(size_t i=0; i<unique_mom.size(); ++i)
-    file << "unique_mom:" << i << " " << unique_mom[i] << endl;
+  file << "cfg=100" << endl;
+	file << "PerambulatorFilename=test_Lx4Lt8/perambulators_nvec254_Nt8.sdb" << endl;
+  file << "EvecFileBase=test_Lx4Lt8/254vecs_" << endl;
+  file << "NDIAGS=" << need_to_compute.size() << endl;
+  file << "mom=";
+  for(size_t i=0; i<unique_mom.size()-1; ++i)
+    file << unique_mom[i] << ",";
+  file << unique_mom[unique_mom.size()-1] << endl;
 
-  file << "unique_gammas:length " << unique_gamma.size() << endl;
-  for(size_t i=0; i<unique_gamma.size(); ++i)
-    file << "unique_gammas:" << i << " " << unique_gamma[i] << endl;
+  file << "gammas=";
+  for(size_t i=0; i<unique_gamma.size()-1; ++i)
+    file << unique_gamma[i] << ",";
+  file << unique_gamma[unique_gamma.size()-1] << endl;
 
-  file << "unique_displacement:length " << unique_disp.size() << endl;
-  for(size_t i=0; i<unique_disp.size(); ++i)
-    file << "unique_displacement:" << i << " " << unique_disp[i] << endl;
-
-	file << "dt_list ";
+	file << "dts=";
 	for(size_t i=0; i<dts.size(); ++i)
 	{
 		file << dts[i];
@@ -912,7 +906,7 @@ void Manager::runtime_input_for_cpu(ofstream &file, vector<Trace<QuarkLine>> nee
 		 file << ",";
 	}
 	file << endl;
-	file << "t_list ";
+	file << "ts=";
 	for(size_t i=0; i<ts.size(); ++i)
 	{
 		file << ts[i];

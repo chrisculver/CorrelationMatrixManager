@@ -74,7 +74,7 @@ string gpu_code_cpp_prefix()
 {
   string text;
   text += "#include \"define_diagrams.h\"\n";
-  text += "#include \"SRC/gpu_kernel.h\"\n";
+  text += "#include \"gpu_kernel.h\"\n";
   text += "#include <complex>\n";
   text += "typedef Eigen::MatrixXcd mat;\n";
   text += "using namespace std;\n";
