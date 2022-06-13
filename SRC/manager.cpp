@@ -104,6 +104,7 @@ void Manager::load_input(string input_filename)
 		for(auto &s : ts_string)
 			ts.push_back( stoi(s) );
 	}
+  
 
 	name_value.erase("dts");
 	name_value.erase("ts");
@@ -303,6 +304,7 @@ void Manager::load_numerical_results_and_compute_tavg_corr()
 			map<string, vector<vector<complex<double>>>> new_diags;
 			parse_diagram_file(new_diags, d_file, lat.nt);
 			cout << "FILL THIS IN" << endl;
+
 			for(const auto &d : new_diags)
 			{
 				if(computed.count(d.first)==0)
@@ -348,6 +350,7 @@ void Manager::load_numerical_results_and_compute_tavg_corr()
 				corrs[idx].load_numerical_results(computed);
 				main_logger->debug("Computing t average for correlator " + to_string(idx));
 				main_logger->flush();
+        //std::cout << "Computing time average for idx=" << idx << std::endl << std::endl;
 				corrs[idx].compute_time_average_correlators();
 				corrs[idx].diags.clear();
 			}

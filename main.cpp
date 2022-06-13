@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	run.compute_time_average_correlators();
+	//run.compute_time_average_correlators();
 
 	run.print_correlators();
 

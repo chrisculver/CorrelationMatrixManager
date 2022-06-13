@@ -186,11 +186,15 @@ template <> void Correlator<QuarkLine>::load_numerical_results(Saved_Diagrams &c
       if( computed.count(t.name()) > 0 )
 			{
         t.numerical_value = computed[t.name()];
-		//		cout << t.name() << " has size " << computed[t.name()].size() << "," << flush;
-		//		cout << computed[t.name()][0].size() << endl << flush;
-
-		//		cout << "tr has size " << t.numerical_value.size() << "," << flush;
-		//		cout << t.numerical_value[0].size() << endl << flush;
+				//cout << t.name() << " has size " << computed[t.name()].size() << "," << flush;
+				//cout << computed[t.name()][0].size() << endl << flush;
+				//cout << "tr has size " << t.numerical_value.size() << "," << flush;
+				//cout << t.numerical_value[0].size() << endl << flush;
+        //for(int i=0; i<computed[t.name()].size(); ++i)
+        //for(int j=0; j<computed[t.name()][0].size(); ++j)
+       // {
+        //  cout << i << " " << j << "  " << computed[t.name()][i][j] << endl;
+        //}
 			}
       else
       {
@@ -228,26 +232,34 @@ template <> void Correlator<QuarkLine>::load_numerical_results(Saved_Diagrams &c
 template <> void Correlator<QuarkLine>::compute_time_average_correlators()
 {
 //	cout << "made it here!" << endl;
-//	cout << "dts.size() = " << dts.size() << "  ts.size()=" << ts.size() << endl;
+	//cout << "dts.size() = " << dts.size() << "  ts.size()=" << ts.size() << endl;
+  //cout << "ops are..." << std::endl;
+  //cout << "c=" << c << std::endl; 
+  //cout << "a=" << a << std::endl; 
   corr_t.resize(dts.size());
 	for(size_t i=0; i<dts.size(); ++i)
   {
 		int dt = dts[i];
     complex<double> time_avg(0.,0.);
-    for(size_t i=0; i<ts.size(); ++i)
+    for(size_t j=0; j<ts.size(); ++j)
     {
-			int t = ts[i];
+			int t = ts[j];
+
+      //std::cout << "computing time avg for dt=" << i << " t=" << j << std::endl;
       for(const auto& d : diags)
       {
         complex<double> trace_product(1.,0.);
         for(const auto& tr : d.traces)
         {
+          //std::cout << "needed tr.num_val[dt=" << dt << ",t=" << t << "]" << tr.numerical_value[dt][t] << std::endl;
           trace_product *= tr.numerical_value[dt][t];
         }///end traces//
         time_avg += complex<double>(d.coef,0)*trace_product;
+        //std::cout << "time_avg+=" << complex<double>(d.coef,0) << "*" << trace_product << std::endl;
       }///end diags
     }///end t
     corr_t[i] = time_avg/(double(ts.size()));
+    //std::cout << "corr_t[" << i << "] = " << corr_t[i] << std::endl;
   }///end dt
 
 }
